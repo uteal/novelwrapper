@@ -7,12 +7,13 @@
 // $      - Data storage object, its initial fields can be set via initial parameters.
 // watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
 // select - Lets the player choose an answer from the options given. To be used with "await".
+// call   - Calls a scene as a subscene. An example will be given below. To be used with "await".
 // print  - Allows you to type text without specifying the speaker. To be used with "await".
 // clear  - Force hide currently visible character and text. For a short pause can be used with "await".
 // sleep  - Explicitly pauses the execution flow, gets time in milliseconds. To be used with "await".
 // log    - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
 // ext    - An object with your custom data, as given at the initialization step.
-export default ({ $, watch, select, print, clear, sleep, log, ext: { showScreen, playMiniGame } }) => ({
+export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showScreen, playMiniGame } }) => ({
 
   // An example of the most basic scene, completely invisible for a player.
   // It does nothing except redirecting the player to another scene named 'road'.
@@ -44,7 +45,7 @@ export default ({ $, watch, select, print, clear, sleep, log, ext: { showScreen,
     // or the emerging landscape for a while. Furthermore, the engine won't start its next built-in action
     // (like a character's speech) until the previous one is finished, and will (hopefully) log an error.
 
-    // [NOTE] It is required to put "await" before each speaking character, select(), print() or sleep().
+    // [NOTE] It is required to put "await" before each speaking character, select(), call(), print() or sleep().
 
     // The character object can be called like a function.
     await Raven('So the rumors were true.')
@@ -191,10 +192,10 @@ export default ({ $, watch, select, print, clear, sleep, log, ext: { showScreen,
   },
 
   // What's interesting about the scene below is that our heroes return there several times, and depending
-  // on their progress, the scene behaves differently. I'm not sure if I can recommend this approach though:
-  // there is nothing stopping you from creating several much simpler scenes that will seem the same scene
-  // to the player. But the approach below works just as well.
+  // on their progress, the scene behaves differently. There is nothing stopping you from creating several
+  // much simpler scenes that will seem the same scene to the player. But the approach below works just as well.
   square: async ({ Raven, Kestrel }) => {
+
     // This code will be re-run every time the scene is entered, so we only need to rely on differences in the state
     // of our data storage. As I said, don't use other variables to store data that needs to persist between scenes.
 
@@ -209,37 +210,13 @@ export default ({ $, watch, select, print, clear, sleep, log, ext: { showScreen,
     await showScreen('square')
 
     // Kestrel must find three forgotten words in her memory. Let them be a FISH, a STAR and a LEAF.
-    // I won't explain all the tricks inside this function as they involve basic programming knowledge.
 
     if ($.FISH == 0 && $.STAR == 0) {
-
-      await Raven
-        `After the last time we spoke alone, I spent a week drinking. So I'm a little nervous.`
-      
-      await Kestrel
-        `You weren't the only one who confessed to me during those years.`
-        `But you did it in the most awkward way. And most funny. This can't be taken away.`
-      
-      await Raven
-        `Not sure my feelings have changed much since then. However, you know, I'm too proud to propose twice.`
-        `I see you have something to share. Is it related to the new portal?`
-      
-      await Kestrel
-        `Today I managed to decipher the last three glyphs of the guard seal.`
-        `But then... it's like someone cast a spell of oblivion on me. As if they didn't want the portal to open yet.`
-      
-      await Raven
-        `Probably one of the corporations is going to claim the portal as their property. We don't even need a new world for a new war.`
-        `But if I remember correctly, you've always been resistant to mind magic. Maybe fresh air will just bring your memory back?`
-      
-      await Kestrel
-        `Are you suggesting that we take a walk arm in arm?`
-        (
-          $.chosen_drink == 'BEER'
-          ? "That's right, who else will hold you when you're so wobbly? Let's go."
-          : "A tempting offer, considering you're the only sober man in the area. Let's go."
-        )
-      
+      // There was quite a large wall of text here, so I decided to put it into a separate scene. The "call" function allows you
+      // to run the specified scene as a plain function (it is still wrapped in Promise and needs "await"). You can pass additional
+      // arguments end even retrieve the return value. (Whatever the *called* scene returns will not cause a redirect or something.)
+      // The called scene of course also has access to the storage ($), so I pass an extra argument there just for demonstration.
+      await call('friendly_talk', $.chosen_drink == 'BEER') // If you're interested, "friendly_talk" scene is added immediately after the current one.
     }
 
     if ($.FISH == 0 && $.STAR == 1) {
@@ -316,6 +293,40 @@ export default ({ $, watch, select, print, clear, sleep, log, ext: { showScreen,
       return '~portal'
     }
     
+  },
+
+  // This scene is created only to be called. It's essentially a conveniently separated chunk of conversation.
+  friendly_talk: async ({ Raven, Kestrel }, isRavenDrunk) => {
+    await Raven
+      `After the last time we spoke alone, I spent a week drinking. So I'm a little nervous.`
+    
+    await Kestrel
+      `You weren't the only one who confessed to me during those years.`
+      `But you did it in the most awkward way. And most funny. This can't be taken away.`
+    
+    await Raven
+      `Not sure my feelings have changed much since then. However, you know, I'm too proud to propose twice.`
+      `I see you have something to share. Is it related to the new portal?`
+    
+    await Kestrel
+      `Today I managed to decipher the last three glyphs of the guard seal.`
+      `But then... it's like someone cast a spell of oblivion on me. As if they didn't want the portal to open yet.`
+    
+    await Raven
+      `Probably one of the corporations is going to claim the portal as their property. We don't even need a new world for a new war.`
+      `But if I remember correctly, you've always been resistant to mind magic. Maybe fresh air will just bring your memory back?`
+    
+    await Kestrel
+      `Are you suggesting that we take a walk arm in arm?`
+      (
+        isRavenDrunk
+        ? "That's right, who else will hold you when you're so wobbly? Let's go."
+        : "A tempting offer, considering you're the only sober man in the area. Let's go."
+      )
+    
+    // During declaration, there is no difference between "normal" and "callable" scenes, so you can call every scene you want.
+    // Just remember that since the called scene is not considered... a scene, no progress is saved when entering or leaving it.
+    // All watchers created inside a called scene are attached to the underlying "normal" scene. This is true even if the called scene calls a scene itself!
   },
 
   fountain: async ({ Raven, Kestrel }) => {

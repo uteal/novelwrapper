@@ -65,9 +65,8 @@ function getCallbacks() {
     onEventLeave(eventName) {
       document.querySelector('#' + eventName).classList.add('watched');
     },
-    onStoreChange(prop, value) {
+    onStoreChange(prop, _value) {
       switch (prop) {
-        case 'chosen_drink': novel.log(value == 'WATER' ? '💧' : '🍺', 'chosen!'); break;
         case 'FISH': novel.log('🐠', 'First clue found!'); break;
         case 'STAR': novel.log('⭐', 'Second clue found!'); break;
         case 'LEAF': novel.log('🍃', 'Last clue found!'); break;
