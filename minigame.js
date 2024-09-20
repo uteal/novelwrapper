@@ -6,7 +6,7 @@ export default () => {
 
   const container = document.createElement('div');
   const w = 600, h = 600;
-  
+
   const leafSpriteEncoded = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADg" +
   "dz34AAAAAXNSR0IArs4c6QAAATJJREFUSIntlTGOwjAQRT9wA0TpJhISsrRFem7hJpdITUnBGXICujQ5xW5PgRRRpXELN" +
   "0ChQIPGztgGFiQKRorsRM77838iG/jWfyufHPq3wn/nee+L8Pt8cujpegreb2eOCBelOV13i3D4cTVzRLgoXxMSGMeETn" +
@@ -17,8 +17,8 @@ export default () => {
   Object.assign(container.style, {
     width: w + 'px',
     height: h + 'px',
-    marginLeft: -w/2 + 'px',
-    marginTop: -h/2 - 80 + 'px',
+    marginLeft: -w / 2 + 'px',
+    marginTop: -h / 2 - 80 + 'px',
     left: '50%',
     top: '50%',
     position: 'absolute',
@@ -40,10 +40,10 @@ export default () => {
 
       Object.assign(el.style, {
         position: 'absolute',
-        left: Math.random() * (w - 50 * 2) - size/2 + 50 + 'px',
+        left: Math.random() * (w - 50 * 2) - size / 2 + 50 + 'px',
         top: -Math.random() * 300 - 50 + 'px',
-        marginLeft: -size/2 + 'px',
-        marginTop: -size/2 + 'px',
+        marginLeft: -size / 2 + 'px',
+        marginTop: -size / 2 + 'px',
         width: size + 'px',
         height: size + 'px',
         transition: 'all 3s ease-out',
@@ -65,7 +65,7 @@ export default () => {
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          el.style.left = Math.random() * w - size/2 + 'px';
+          el.style.left = Math.random() * w - size / 2 + 'px';
           el.style.top = '700px';
           el.style.transform = `rotate(${(Math.random() < 0.5 ? 1 : -1) * Math.random() * 360}deg)`;
         });
@@ -84,7 +84,7 @@ export default () => {
 
   const endGame = () => {
     container.style.pointerEvents = 'none';
-    container.style.opacity = 0;
+    container.style.opacity = '0';
     setTimeout(() => {
       container.remove();
     }, 1500);
@@ -110,4 +110,5 @@ export default () => {
     };
     addNextLeaf();
   });
+
 };
