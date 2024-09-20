@@ -214,7 +214,7 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
     if ($.FISH == 0 && $.STAR == 0) {
       // There was quite a large wall of text here, so I decided to put it into a separate scene. The "call" function allows you
       // to run the specified scene as a plain function (it is still wrapped in Promise and needs "await"). You can pass additional
-      // arguments end even retrieve the return value. (Whatever the *called* scene returns will not cause a redirect or something.)
+      // arguments end even retrieve the return value. (Whatever the called scene returns will not cause a redirect or something.)
       // The called scene of course also has access to the storage ($), so I pass an extra argument there just for demonstration.
       await call('friendly_talk', $.chosen_drink == 'BEER') // If you're interested, "friendly_talk" scene is added immediately after the current one.
     }
@@ -297,6 +297,11 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
 
   // This scene is created only to be called. It's essentially a conveniently separated chunk of conversation.
   friendly_talk: async ({ Raven, Kestrel }, isRavenDrunk) => {
+
+    // During declaration, there is no difference between "normal" and "callable" scenes, so you can call every scene you want.
+    // Just remember that since the called scene is not considered... a scene, no progress is saved when entering or leaving it.
+    // All watchers created inside a called scene are attached to the underlying "normal" scene. This is true even if the called scene calls a scene itself!
+
     await Raven
       `After the last time we spoke alone, I spent a week drinking. So I'm a little nervous.`
     
@@ -323,10 +328,6 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
         ? "That's right, who else will hold you when you're so wobbly? Let's go."
         : "A tempting offer, considering you're the only sober man in the area. Let's go."
       )
-    
-    // During declaration, there is no difference between "normal" and "callable" scenes, so you can call every scene you want.
-    // Just remember that since the called scene is not considered... a scene, no progress is saved when entering or leaving it.
-    // All watchers created inside a called scene are attached to the underlying "normal" scene. This is true even if the called scene calls a scene itself!
   },
 
   fountain: async ({ Raven, Kestrel }) => {
