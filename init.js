@@ -18,27 +18,30 @@ const novel = createNovel(
 
   // Initial params, none is obligatory. Default values can be seen in the engine file.
   {
-    $: {                          // This is where all the game progress data should be stored,
-      FISH: 0, STAR: 0, LEAF: 0   // must be JSON-serializable to saves to work properly. Empty
-    },                            // object by default.
+    $: {                           // This is where all the game progress data should be stored,
+      FISH: 0, STAR: 0, LEAF: 0    // must be JSON-serializable to saves to work properly. Empty
+    },                             // object by default.
 
-    firstScene: 'start',          // Entry point of the novel, defaults to "start".
-    devMode: true,                // Allows the engine to output logs. Essential during development.
-    stepTime: 1000 / 60,          // The time it takes to print each symbol in milliseconds. Instant if zero.
-    skipRestoring: false,         // Should the game ignore (and clear) the previous save? Default is false.
+    firstScene: 'start',           // Entry point of the novel, defaults to "start".
+    devMode: true,                 // Allows the engine to output logs. Essential during development.
+    stepTime: 1000 / 60,           // The time it takes to print each symbol in milliseconds. Instant if zero.
+    skipRestoring: false,          // Should the game ignore (and clear) the previous save? Default is false.
 
-    callbacks: {                  // Callbacks for routine events can be placed here. For example, you can play
-      ...getCallbacks()           // a short typing sound on every symbol printed. Many callbacks receive useful
-    },                            // arguments as input. Full list of the callbacks can be seen in the engine file.
+    callbacks: {                   // Callbacks for routine events can be placed here. For example, you can play
+      ...getCallbacks()            // a short typing sound on every symbol printed. Many callbacks receive useful
+    },                             // arguments as input. Full list of the callbacks can be seen in the engine file.
 
-    ext: {                        // Engine do not helps with anything except character conversations,
-      showScreen, playMiniGame    // so sometimes you will need a bunch of your own custom functions.
-    },                            // To easily throw them into the scenes, "ext" object can be used.
+    ext: {                         // Engine do not helps with anything except character conversations,
+      showScreen, playMiniGame     // so sometimes you will need a bunch of your own custom functions.
+    },                             // To easily throw them into the scenes, "ext" object can be used.
 
-    cssPrefix: 'novel',           // Engine will use this when searching for CSS styles.
-    imagesPath: './assets/chars', // Path to folder with novel characters' portraits.
-    imagesType: 'png',            // File extension of your characters' portraits. Default is png.
-    appendTo: '#game'             // Where the novel element should be placed. Defaults to document.body.
+    multiLangSplitRegex: /\s>>\s/, // Default: /\s>>\s/. Engine allows multilingual strings, like "Thank you! >> Danke!".
+    language: -1,                  // Default: -1 (i.e. no translation). Which part of the split string should be shown.
+
+    cssPrefix: 'novel',            // Engine will use this when searching for CSS styles.
+    imagesPath: './assets/chars',  // Path to folder with novel characters' portraits.
+    imagesType: 'png',             // File extension of your characters' portraits. Default is png.
+    appendTo: '#game'              // Where the novel element should be placed. Defaults to document.body.
   }
 
 );
