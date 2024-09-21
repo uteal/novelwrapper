@@ -42,10 +42,10 @@ async ({ Raven, Kestrel }) => {
 ```
 
 ### Ecological niche
-The engine meant to be small and easily embeddable, while providing powerful tools for telling complex stories through characters and their lines. It doesn't care about things like preloading assets, switching backgrounds, animating sprites, or playing sounds. If you can't do these things yourself (and if you need them), consider a heavier, more feature-rich visual novel engine like Ren'Py.
+The engine meant to be small and easily embeddable, while providing powerful tools for telling complex stories through characters and their lines. It doesn't care about preloading assets, switching backgrounds, animating sprites, or playing sounds. If you can't do these things yourself (and if you still need them), consider a heavier, more feature-rich visual novel engine like Ren'Py.
 
 ### No warranty
-The engine is in early development, so breaking changes between versions are possible. The source code, although carefully written, may still contain bugs. Regular updates are likely but not guaranteed, so think twice before starting a serious project relying on this engine unless you are experienced enough to troubleshoot issues yourself.
+The engine is still in its infancy, so breaking changes between versions are possible. The source code, although carefully written, may still contain bugs. Regular updates are likely but not guaranteed.
 
 ### How to start
 To start using the engine, simply download the "lib" folder and import its contents into your project. The "nwrap.js" is the engine itself. The second file includes the minimum CSS styles needed by the engine, and can be subsequently modified by you to suit the needs of your project (feel free to experiment with it). If ES modules are not to your liking, open "nwrap.js" and change the export method as specified in the hint inside.
