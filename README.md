@@ -42,7 +42,7 @@ async ({ Raven, Kestrel }) => {
 ```
 
 ### Ecological niche
-The engine meant to be small and easily embeddable, while providing powerful tools for telling complex stories through characters and their lines. It doesn't care about preloading assets, switching backgrounds, animating sprites, or playing sounds. If you can't do these things yourself (and still need them), consider a heavier, more feature-rich visual novel engine like Ren'Py.
+The engine was originally designed as a subsystem of a larger game, to be small and easy to embed, but still provide powerful tools for telling stories through characters and their lines. It doesn't care about preloading assets, switching backgrounds, animating sprites, or playing sounds. If you can't do these things yourself (and still need them), consider a heavier, more feature-rich visual novel engine like Ren'Py.
 
 ### No warranty
 The engine is still in its infancy, so breaking changes between versions are possible. The source code, although carefully written, may still contain bugs. Regular updates are likely but not guaranteed.
