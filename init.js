@@ -35,13 +35,17 @@ const novel = createNovel(
       showScreen, playMiniGame     // so sometimes you will need a bunch of your own custom functions.
     },                             // To easily throw them into the scenes, "ext" object can be used.
 
-    multiLangSplitRegex: /\s>>\s/, // Default: /\s>>\s/. Engine allows multilingual strings, like "Thank you! >> Danke!".
-    language: -1,                  // Default: -1 (i.e. no translation). Which part of the split string should be shown.
-
     cssPrefix: 'novel',            // Engine will use this when searching for CSS styles.
     imagesPath: './assets/chars',  // Path to folder with novel characters' portraits.
     imagesType: 'png',             // File extension of your characters' portraits. Default is png.
-    appendTo: '#game'              // Where the novel element should be placed. Defaults to document.body.
+    appendTo: '#game',             // Where the novel element should be placed. Defaults to document.body.
+
+    // -- Advanced parameters. None of them are used here. --
+
+    delays: {},                    // Here you can set some engine's animation delays. See the engine file for a list of them.
+    defaultAlign: 'right',         // Starting alignment of each character. Default is "right", other possible is "left".
+    multiLangSplitRegex: /\s>>\s/, // Engine allows multilingual strings, like "Thank you! >> Danke!". Default: /\s>>\s/.
+    language: -1,                  // Which part of the split string should be shown. Default: -1 (i.e. no translation).
   }
 
 );

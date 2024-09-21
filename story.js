@@ -30,9 +30,10 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
     // The "$" prefix signals that the method modifies the character's persistent data.
     // For example, a character's name set in one scene will be the same in another.
     Raven
-    //.$toRight()            // The default position for a newly created character is right, so this method is not needed here.
-      .$toLeft()             // I'll move Raven to the left side of the screen since he is the main character.
-      .$setName('Wanderer')  // A label that will be shown near the character. It can be changed at any time.
+    //.$flipImage()         // Flip character's portraits horizontally. Not needed here.
+    //.$toRight()           // The default position for a newly created character is right, so this method is not needed here.
+      .$toLeft()            // I'll move Raven to the left side of the screen since he is the main character.
+      .$setName('Wanderer') // A label that will be shown near the character. It can be changed at any time.
 
     // The character is still invisible. He will appear when he needs to say something.
     // Let's show the landscape of the current scene. This is what our custom function is for.

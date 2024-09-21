@@ -40,6 +40,10 @@
   right: 0;
 }
 
+.novel-character-flipped .novel-portrait {
+  transform: scaleX(-1);
+}
+
 .novel-portrait {
   position: absolute;
   inset: 0;
