@@ -239,8 +239,8 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
       await Kestrel.smiling
         `If you are so impressionable, be careful when looking in the mirror.`
 
-      // If the mood is not specified, it is considered basic. Basic mood is "_", so "Kestrel/_.png" is the main portrait.
-      // (It is technically correct to write "Kestrel._" by analogy with "Kestrel.smiling", but it is redundant.)
+      // If the mood is not specified, it is considered "normal", so "Kestrel/normal.png" is the main portrait.
+      // (It is technically correct to write "Kestrel.normal" by analogy with "Kestrel.smiling", but it is redundant.)
       await Kestrel
         `Just kidding. You might be right about him.`
     }
@@ -299,9 +299,9 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
   // This scene is created only to be called. It's essentially a conveniently separated chunk of conversation.
   friendly_talk: async ({ Raven, Kestrel }, isRavenDrunk) => {
 
-    // During declaration, there is no difference between "normal" and "callable" scenes, so you can call every scene you want.
+    // During declaration, there is no difference between "regular" and "callable" scenes, so you can call every scene you want.
     // Just remember that since the called scene is not considered... a scene, no progress is saved when entering or leaving it.
-    // All watchers created inside a called scene are attached to the underlying "normal" scene. This is true even if the called scene calls a scene itself!
+    // All watchers created inside a called scene are attached to the underlying non-called scene. This is true even if the called scene calls a scene itself!
 
     await Raven
       `After the last time we spoke alone, I spent a week drinking. So I'm a little nervous.`
