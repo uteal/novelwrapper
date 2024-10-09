@@ -27,8 +27,8 @@ const novel = createNovel(
     stepTime: 1000 / 60,           // The time it takes to print each symbol in milliseconds. Instant if zero.
     skipRestoring: false,          // Should the game ignore (and clear) the previous save? Default is false.
 
-    callbacks: [                   // Callbacks for standard events can be placed here inside dictionaries,
-      getCallbacks()               // for example { onGameStart: myCallback1, onGameEnd: myCallback2 }.
+    callbacks: [                   // Callbacks for standard events can be placed here in form of object or
+      getCallbacks()               // array of objects, for example [{ onShow: f1, onHide: f2 }, { onShow: f3 }].
     ],                             // Full list of the callbacks can be seen in the engine file.
 
     ext: {                         // Engine do not helps with anything except character conversations,
