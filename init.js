@@ -37,7 +37,7 @@ const novel = createNovel(
 
     cssPrefix: 'novel',            // Engine will use this when searching for CSS styles.
     imagesPath: './assets/chars',  // Path to folder with novel characters' portraits.
-    imagesType: 'png',             // File extension of your characters' portraits. Default is png.
+    imagesType: 'png',             // File extension of your character portraits. Default is png.
     appendTo: '#game',             // Where the novel element should be placed. Defaults to document.body.
 
     // -- Advanced parameters. None of them are used here. --
