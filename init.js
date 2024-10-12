@@ -42,10 +42,10 @@ const novel = createNovel(
 
     // -- Advanced parameters. None of them are used here. --
 
-    delays: {},                    // Here you can set some engine's animation delays. See the engine file for a list of them.
-    defaultAlign: 'right',         // Starting alignment of each character. Default is "right", other possible is "left".
-    multiLangSplitRegex: /\s>>\s/, // Engine allows multilingual strings, like "Thank you! >> Danke!". Default: /\s>>\s/.
-    language: -1,                  // Which part of the split string should be shown. Default: -1 (i.e. no translation).
+    delays: {},                      // Here you can set some engine's animation delays. See the engine file for a list of them.
+    defaultAlign: 'right',           // Starting alignment of each character. Default is "right", other possible is "left".
+    multiLangSplitRegex: /\s+>>\s+/, // Engine allows multilingual strings, like "Thank you! >> Danke!". /\s+>>\s+/ by default.
+    language: -1,                    // Which part of the split string should be shown. Default: -1 (i.e. no translation).
   }
 
 );
