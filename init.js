@@ -13,7 +13,7 @@ const novel = createNovel(
   // Unique name used to differentiate between progress saves.
   'the_glyphs',
 
-  // Function or array of functions, that return dictionaries of novel scenes. Look "story.js" for more.
+  // A function or array of functions that return dictionaries of novel scenes. Look "story.js" for more.
   myStory,
 
   // Initial params, none is obligatory. Default values can be seen in the engine file.
