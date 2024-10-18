@@ -1,5 +1,5 @@
 // The engine. Feel free to check out the source code.
-import createNovel from './lib/nwrap.js';
+import createNovel from '../lib/nwrap.js';
 
 // Here is a visual novel script written by the author. Comments act as a built-in tutorial.
 import myStory from './story.js';

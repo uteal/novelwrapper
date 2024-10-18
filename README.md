@@ -2,7 +2,7 @@
 
 ### Overview
 A quick-to-learn, fun-to-use JavaScript engine for creating browser-based visual novels.<br />
-Check out the live demo: [The Glyphs](https://uteal.github.io/novelwrapper/).
+Check out the live demo: [The Glyphs](https://uteal.github.io/novelwrapper/The%20Glyphs).
 
 ### Features
 🎓 Easy to pick up. Basic knowledge of JS is enough.<br />
@@ -51,4 +51,4 @@ The engine is still in its infancy, so breaking changes between versions are pos
 To start using the engine, simply download the "lib" folder and import its contents into your project. The "nwrap.js" is the engine itself. The second file includes the minimum CSS styles needed by the engine, and can be subsequently modified by you to suit the needs of your project (feel free to experiment with it). If ES modules are not to your liking, open "nwrap.js" and change the export method as specified in the hint inside.
 
 ### Documentation, maybe?
-Although there is no separate documentation yet, the "init.js" and "story.js" files contain an effectively comprehensive tutorial, covering all the main features of the engine.
+Although there is no separate documentation yet, the "init.js" and "story.js" files inside "The Glyphs" folder contain an effectively comprehensive tutorial, covering all the main features of the engine.
