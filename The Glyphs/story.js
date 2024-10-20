@@ -108,9 +108,9 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
       `But has anyone been able to broke the guard seal yet?`
       `Whatever. I need to wet my throat.`
 
-    // The "select" function is very simple: it allows the player to choose one of several options passed to it,
-    // and returns the ordinal number of chosen option (starting from zero). Thus, answer_num will be equal to 0 or 1
-    // depending on the player's choice. And don't forget to "await" while the player makes his decision.
+    // The "select" function allows the player to choose one of several options passed to it, and (in its simplest form)
+    // returns the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
+    // on the player's choice. And don't forget to "await" while the player makes his decision.
     const answer_num = await select(
       "Bring me a mug of beer!",   // 0
       "I'd like a glass of water." // 1
@@ -119,6 +119,12 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
     // Let's say I want to record the player's drink choice for future reference. This is where
     // the game data object comes in handy. It's persistent between game sessions, and that's the whole point.
     $.chosen_drink = ['BEER', 'WATER'][answer_num] // Well, really, why not save it in a more readable form?
+
+    // Alternative notation. You can pass objects as options to get string keys instead of numbers.
+    // $.chosen_drink = await select(
+    //   { BEER : "Bring me a mug of beer!"    }, // "BEER"
+    //   { WATER: "I'd like a glass of water." }  // "WATER"
+    // )
 
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.
     clear()
