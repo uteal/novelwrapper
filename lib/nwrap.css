@@ -1,0 +1,226 @@
+/*
+  Base
+*/
+
+.novel-container {
+  user-select: none;
+  overflow: hidden;
+}
+
+.novel-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+  Characters
+*/
+
+.novel-character {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  bottom: 40px;
+  transition: all 0.5s ease;
+}
+
+.novel-character-align-left {
+  left: 20px;
+}
+
+.novel-character-align-right {
+  right: 20px;
+}
+
+.novel-character-align-left.novel-character-inactive {
+  left: 0;
+}
+
+.novel-character-align-right.novel-character-inactive {
+  right: 0;
+}
+
+.novel-character-flipped .novel-portrait {
+  transform: scaleX(-1);
+}
+
+.novel-portrait {
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-position: bottom;
+  background-repeat: no-repeat;
+  transition: opacity 0.5s ease;
+}
+
+.novel-portrait-hidden {
+  opacity: 0;
+}
+
+.novel-label {
+  position: absolute;
+  bottom: 0;
+  color: #eee;
+  font: 18px Arial;
+  text-shadow: 0 1px 2px #000;
+  transition: all 0.3s ease;
+}
+
+.novel-character-align-left .novel-label {
+  left: -20px;
+  padding-left: 20px;
+  padding-right: 50px;
+  background: linear-gradient(90deg,
+    rgba(80,80,80,1) 0%,
+    rgba(80,80,80,0.8) 70%,
+    rgba(80,80,80,0) 100%
+  );
+}
+
+.novel-character-align-right .novel-label {
+  right: -20px;
+  text-align: right;
+  padding-left: 50px;
+  padding-right: 20px;
+  background: linear-gradient(270deg,
+    rgba(80,80,80,1) 0%,
+    rgba(80,80,80,0.8) 70%,
+    rgba(80,80,80,0) 100%
+  );
+}
+
+.novel-label-hidden {
+  opacity: 0;
+}
+
+/*
+  Textbox
+*/
+
+.novel-textbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  min-height: 180px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eee;
+  font: 24px Arial;
+  white-space: pre-wrap;
+  background-color: rgba(40, 40, 40, 0.5);
+  backdrop-filter: blur(20px);
+  box-sizing: border-box;
+  transition: all 0.8s ease;
+  transition-property: opacity, background-color;
+}
+
+.novel-textbox-hidden {
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+.novel-message {
+  max-width: 1000px;
+}
+
+.novel-thought {
+  color: rgb(164, 164, 164);
+}
+
+.novel-message-placeholder {
+  color: transparent;
+}
+
+.novel-message-rendered {
+  text-shadow: 0 1px 2px #000;
+}
+
+@keyframes novelCursorFlicker {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.novel-message-rendered-stopped::after {
+  translate: 4px 0;
+  content: '_';
+  position: absolute;
+  animation-name: novelCursorFlicker;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+
+.novel-textbox-left {
+  padding-left: 200px;
+}
+
+.novel-textbox-right {
+  padding-right: 200px;
+}
+
+/*
+  Select
+*/
+
+.novel-choices {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.novel-select {
+  min-width: 300px;
+  max-width: 800px;
+  border-radius: 8px;
+  border: 2px solid #aaa;
+  overflow: hidden;
+  box-shadow: 1px 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.5s ease;
+  translate: 0 -100px;
+}
+
+.novel-select-hidden {
+  opacity: 0;
+  translate: 0 -120px;
+}
+
+.novel-select-option {
+  color: #ddd;
+  padding: 20px 40px;
+  background-color: #444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font: 20px Arial;
+  text-align: center;
+}
+
+.novel-select-option + .novel-select-option {
+  border-top: 1px solid #666;
+}
+
+.novel-select-option:hover {
+  background-color: #111;
+}
+
+/*
+  Automatically tracked elements, i.e. elements that have
+  an attribute named as specified in the "watchedAttr" parameter.
+*/
+
+/*
+.novel-watched {
+  border: 2px solid white;
+}
+
+.novel-watched-clicked {
+  border: 2px solid greenyellow;
+}
+
+.novel-watched-clicked-other {
+  border: 2px solid red;
+}
+*/

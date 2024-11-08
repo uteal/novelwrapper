@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>The Glyphs</title>
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="../lib/nwrap.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div id="container">
+
+    <div id="game">
+
+      <div id="road" class="screen hidden">
+        <div nw-event="to_tavern" class="clickable" x="890" y="410" d="100"></div>
+      </div>
+
+      <div id="tavern" class="screen hidden"></div>
+
+      <div id="square" class="screen hidden">
+        <div nw-event="to_fountain" class="clickable" x="425" y="545" d="100"></div>
+        <div nw-event="to_beacon" class="clickable" x="500" y="340" d="100"></div>
+        <div nw-event="to_chasm" class="clickable" x="1120" y="600" d="100"></div>
+      </div>
+
+      <div id="fountain" class="screen hidden">
+        <div nw-event="coins" class="clickable" x="540" y="410" d="100"></div>
+      </div>
+
+      <div id="beacon" class="screen hidden">
+        <div nw-event="lighthouse" class="clickable" x="550" y="150" d="100"></div>
+        <div nw-event="star" class="clickable" x="1010" y="90" d="100"></div>
+      </div>
+
+      <div id="chasm" class="screen hidden">
+        <div nw-event="tree_on_the_edge" class="clickable" x="500" y="170" d="100"></div>
+      </div>
+
+      <div id="portal" class="screen hidden"></div>
+
+      <div id="active_portal" class="screen hidden"></div>
+
+    </div>
+
+  </div>
+  <script src="./init.js" type="module"></script>
+</body>
+
+</html>

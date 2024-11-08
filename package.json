@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "build": "esbuild ./lib/nwrap.js --minify --outfile=./lib/nwrap.min.js"
+  }
+}
