@@ -129,10 +129,6 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     )
     */
 
-    // [NOTE] Persistent data object ($) does not allow to assign properties starting with double underscore:
-    // $.__myProp = 5; // results in an error
-    // Such props are reserved by the engine for storing game's internal state (like the current scene name).
-
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.
     clear()
     await sleep(1000)
@@ -219,8 +215,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // the data storage is in an intermediate state and not ready.
 
     // Here I just want to see the contents of the data storage in the console, marked with the fancy floppy disk emoji.
-    // [HINT] When you log the game data object using the engine's log function, it unwraps and cleans up the actual $ value,
-    // removing all the "__"-starting utility properties, just for better display.
+    // [HINT] When you log the game data object using the engine's log function, it additionally unwraps the actual $ value.
     log('💾', $)
 
     await showScreen('square')
