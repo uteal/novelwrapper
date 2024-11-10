@@ -11,9 +11,10 @@
 // print  - Allows you to type text without specifying the speaker. To be used with "await".
 // clear  - Force hide currently visible character and text. For a short pause can be used with "await".
 // sleep  - Explicitly pauses the execution flow, gets time in milliseconds. To be used with "await".
+// save   - Saves the current game state immediately. Only use if you know what you're doing.
 // log    - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
 // ext    - An object with your custom data, as given at the initialization step.
-export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showScreen, playMiniGame } }) => ({
+export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
 
   // An example of the most basic scene, completely invisible for a player.
   // It does nothing except redirecting the player to another scene named 'road'.
@@ -226,12 +227,18 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
 
     // Kestrel must find three forgotten words in her memory. Let them be a FISH, a STAR and a LEAF.
 
-    if ($.FISH == 0 && $.STAR == 0) {
+    if ($.FISH == 0 && $.STAR == 0 && $.friendly_talk_was_shown != true) {
       // There was quite a large wall of text here, so I decided to put it into a separate scene. The "call" function allows you
       // to run the specified scene as a plain function (it is still wrapped in Promise and needs "await"). You can pass additional
       // arguments end even retrieve the return value. (Whatever the called scene returns will not cause a redirect or something.)
       // The called scene of course also has access to the storage ($), so I pass an extra argument there just for demonstration.
       await call('friendly_talk', $.chosen_drink == 'BEER') // If you're interested, "friendly_talk" scene is added immediately after the current one.
+
+      // Once you feel confident in managing the game state, you can save it at any time (by default it only saves between scenes,
+      // where it is safe to do so). Here I update an "autosave" slot so that if the player leaves the game before exiting this scene
+      // (i.e. before "autosave" normally written), he still won't see next time the long dialogue above.
+      $.friendly_talk_was_shown = true
+      save() // the same as 'save("autosave")'
     }
 
     if ($.FISH == 0 && $.STAR == 1) {
@@ -414,6 +421,11 @@ export default ({ $, watch, select, call, print, clear, sleep, log, ext: { showS
   },
 
   chasm: async ({ Raven, Kestrel }) => {
+    // We already have an autosave, but if there was an important plot branch here and we wanted to create
+    // an additional restore point that wouldn't be overwritten automatically, we could write the game state
+    // to a specific slot, like this:
+    // save('leaf_fall')
+
     await showScreen('chasm')
     await Raven
       `There is something mesmerizing about this tree.`

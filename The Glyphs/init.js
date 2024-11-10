@@ -27,6 +27,11 @@ const novel = createNovel(
     stepTime: 1000 / 60,           // The time it takes to print each symbol in milliseconds. Instant if zero.
     restoreFromSlot: 'autosave',   // The game tries to load from the specified slot, "autosave" by default. Nullify to start over.
 
+    useLocationHash: true,         // If true, the game will store its state as the hash of the window location (URL). This can be a great
+                                   // help during development, as it allows you to visually track the state of the game, create bookmarks
+                                   // to quickly return to any state, and navigate through states using the browser's back and forward buttons.
+                                   // Defaults to false, which means using the browser's local storage to store game state.
+    
     callbacks: [                   // Callbacks for standard events can be set as a single object or an array
       getCallbacks()               // of objects, for example: [{ onShow: f1, onHide: f2 }, { onShow: f3 }].
     ],                             // Full list of the callbacks can be seen in the engine file.
