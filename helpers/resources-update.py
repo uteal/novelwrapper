@@ -4,8 +4,8 @@
 import os
 import json
 
-# Finds all files with the allowed extension in the specified path
-# and subfolders, writing the paths to them to the specified file.
+# Finds all files with allowed extensions in the specified path
+# and subfolders, writing their paths to the specified file.
 def list_resources(start_from, output_file, allowed_ext):
   arr = []
   for root, dirs, files in os.walk(start_from):
@@ -20,5 +20,5 @@ def list_resources(start_from, output_file, allowed_ext):
 list_resources(
   start_from = '.',
   output_file = 'resources.json',
-  allowed_ext = ['jpg', 'png', 'gif', 'mp3', 'wav', 'ogg']
+  allowed_ext = ['jpg', 'png', 'gif']
 )
