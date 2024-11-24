@@ -5,6 +5,7 @@ export default class ScreenSwitcher {
   #prev = '__prev__';
   #exit = '__exit__';
   #exited = false;
+  #switchOnly;
   #searchTemplate;
   #element = null;
   #transitionTime;
@@ -18,6 +19,7 @@ export default class ScreenSwitcher {
   /**
    * Provides smooth switching between screens.
    * @param {object} params Constructor params.
+   * @param {string} params.switchOnly Do not search or load images. In this case, you must take care of filling the screen components yourself.
    * @param {string} params.searchTemplate Image search template. The * will be replaced with the requested name. Default is "./screens/*.jpg".
    * @param {number} params.transitionTime Screen change time in milliseconds.
    * @param {(string|HTMLElement)} params.appendTo Where the element should be placed. Defaults to document.body.
@@ -34,12 +36,14 @@ export default class ScreenSwitcher {
    *    bg.__exit__       // Destroy the ScreenSwitcher instance and remove its element.
    */
   constructor({
+    switchOnly = false,
     searchTemplate = './screens/*.jpg',
     transitionTime = 1000,
     appendTo = document.body,
-    onBeforeScreenShow = (_name, _elem) => {},
-    onAfterScreenHide = (_name, _elem) => {}
+    onBeforeScreenShow = async (_name, _elem) => { },
+    onAfterScreenHide = async (_name, _elem) => { }
   } = {}) {
+    this.#switchOnly = switchOnly;
     this.#searchTemplate = searchTemplate;
     this.#transitionTime = transitionTime;
     this.#onBeforeScreenShow = onBeforeScreenShow;
@@ -78,7 +82,7 @@ export default class ScreenSwitcher {
     });
   }
 
-  #setScreen(name) {
+  async #setScreen(name) {
     if (this.#working) {
       this.#tasks.push(name);
       return;
@@ -100,54 +104,52 @@ export default class ScreenSwitcher {
       this.#history.shift();
     }
     this.#working = true;
-    return new Promise((resolve) => {
-      const { firstChild, lastChild } = this.#element;
-      if (name === this.#none) {
-        this.#hide(lastChild, async () => {
-          if (this.#exited) {
-            resolve();
-            return;
-          }
-          this.#onAfterScreenHide?.(lastName, lastChild);
-          this.#visible = false;
-          this.#working = false;
-          await this.#nextTask();
+    const { firstChild, lastChild } = this.#element;
+    if (name === this.#none) {
+      await this.#hide(lastChild);
+      await this.#onAfterScreenHide?.(lastName, lastChild);
+      this.#visible = false;
+      this.#working = false;
+      await this.#nextTask();
+    } else if (this.#switchOnly) {
+      await this.#onBeforeScreenShow?.(name, firstChild);
+      this.#show(firstChild, !this.#visible);
+      await this.#hide(lastChild);
+      await this.#onAfterScreenHide?.(lastName, lastChild);
+      this.#element.prepend(lastChild);
+      this.#working = false;
+      await this.#nextTask();
+    } else {
+      let resolve;
+      const promise = new Promise((res) => (resolve = res));
+      const image = new Image();
+      image.src = this.#searchTemplate.replace('*', name);
+      image.onload = async () => {
+        if (this.#exited) {
           resolve();
-        });
-      } else {
-        const image = new Image();
-        image.src = this.#searchTemplate.replace('*', name);
-        image.onload = () => {
-          if (this.#exited) {
-            resolve();
-            return;
-          }
-          firstChild.style.backgroundImage = `url('${image.src}')`;
-          this.#onBeforeScreenShow?.(name, firstChild);
-          this.#show(firstChild, !this.#visible);
-          this.#hide(lastChild, async () => {
-            if (this.#exited) {
-              resolve();
-              return;
-            }
-            this.#onAfterScreenHide?.(lastName, lastChild);
-            this.#element.prepend(lastChild);
-            this.#working = false;
-            await this.#nextTask();
-            resolve();
-          });
-        };
-        image.onerror = async () => {
-          if (this.#exited) {
-            resolve();
-            return;
-          }
-          this.#working = false;
-          await this.#nextTask();
+          return;
+        }
+        firstChild.style.backgroundImage = `url('${image.src}')`;
+        await this.#onBeforeScreenShow?.(name, firstChild);
+        this.#show(firstChild, !this.#visible);
+        await this.#hide(lastChild);
+        await this.#onAfterScreenHide?.(lastName, lastChild);
+        this.#element.prepend(lastChild);
+        this.#working = false;
+        await this.#nextTask();
+        resolve();
+      };
+      image.onerror = async () => {
+        if (this.#exited) {
           resolve();
-        };
-      }
-    });
+          return;
+        }
+        this.#working = false;
+        await this.#nextTask();
+        resolve();
+      };
+      await promise;
+    }
   }
 
   #show(elem, smooth = false) {
@@ -160,20 +162,20 @@ export default class ScreenSwitcher {
     });
   }
 
-  #hide(elem, onComplete) {
-    elem.style.transitionDuration = this.#transitionTime + 'ms';
-    requestAnimationFrame(() => {
+  #hide(elem) {
+    return new Promise((resolve) => {
+      elem.style.transitionDuration = this.#transitionTime + 'ms';
       requestAnimationFrame(() => {
-        elem.style.opacity = '0';
-        if (onComplete) {
-          setTimeout(onComplete, this.#transitionTime);
-        }
+        requestAnimationFrame(() => {
+          elem.style.opacity = '0';
+          setTimeout(resolve, this.#transitionTime);
+        });
       });
     });
   }
 
   #nextTask() {
-    if (this.#tasks.length) {
+    if (!this.#exited && this.#tasks.length) {
       return this.#setScreen(this.#tasks.shift());
     }
   }
