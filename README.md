@@ -46,7 +46,7 @@ async ({ Raven, Kestrel }) => {
 The engine was originally designed as a subsystem of a larger game, to be small and easy to embed, but still provide powerful tools for telling stories through characters and their lines. Accompanied by a set of helper scripts, it is more like a construction kit than a monolithic solution. If you need the latter, consider a heavier, more feature-rich visual novel engine like Ren'Py.
 
 ### What is PicoVN?
-PicoVN is a ready-to-use build of the engine, bundled together with tools specifically designed for working with low-resolution pixel art. (Coming soon.)
+PicoVN is a ready-to-use build of the engine, bundled together with tools specifically designed for working with low-resolution pixel graphics. (Coming soon.)
 
 ### No warranty
 The engine is still in its infancy, so breaking changes between versions are possible. The source code, although carefully written, may still contain bugs. Regular updates are likely but not guaranteed.
