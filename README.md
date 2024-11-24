@@ -9,6 +9,7 @@ Check out the live demo: [The Glyphs](https://uteal.github.io/novelwrapper/The%2
 ☕ Little new. Use DOM events, use CSS styles.<br />
 💬 Thoroughly explained example code.<br />
 🛠️ Supplemented with a set of useful tools.<br />
+👾 Upcoming PicoVN build for pixel-art novels.<br />
 🌱 Seamless integration into any web-page.<br />
 🕊️ Lightweight. No bundlers, no compilation step.<br />
 🥩 A concise, juicy way of scripting.<br />
