@@ -14,12 +14,12 @@
 -- Script will IGNORE:
 -- 1) Hidden layers and hidden groups.
 -- 2) Layers and groups whose name contains __ (double underscore).
--- 3) Layers that do not belong to any group.
--- 4) Nested groups (i.e. groups within a group).
+-- 3) Nested groups (i.e. groups within a group).
 
 -- How it works:
 -- Each first-level (not nested) group with one or more visible layers will be converted
--- into a sprite group. Each non-empty image layer inside will be converted into a sprite.
+-- into a sprite group. Each non-empty image layer will be converted into a sprite in a group.
+-- First-level image layers become self-containing groups with one sprite inside.
 
 -- Passing additional params:
 -- You can pass additional information about the sprite, which will be reflected in the JSON file or will affect the
@@ -79,6 +79,9 @@ local function parseFileName(str)
     elseif ch == "." then
       last_point_index = i
     end
+  end
+  if not last_slash_index then
+    error("First save the file somewhere on a disk.")
   end
   return
     str:sub(1, last_slash_index - 1),
@@ -192,11 +195,19 @@ local groups = {}
 do
   local count = 0
   for _, layer in ipairs(sprite.layers) do
-    if layer.isVisible and layer.isGroup and isAllowed(layer.name) then
-      local image_layers = extract(layer.layers, {})
-      if #image_layers > 0 then
-        table.insert(groups, { name = layer.name, layers = image_layers })
-        count = count + #image_layers
+    if layer.isVisible and isAllowed(layer.name) then
+      if layer.isGroup then
+        local image_layers = extract(layer.layers, {})
+        if #image_layers > 0 then
+          table.insert(groups, { name = layer.name, layers = image_layers })
+          count = count + #image_layers
+        end
+      elseif layer.isImage and #layer.cels > 0 then
+        local index = layer.name:find("<")
+        local cleaned_name = index and layer.name:sub(1, index - 1) or layer.name
+        cleaned_name = cleaned_name:gsub("^%s+", ""):gsub("%s+$", "")
+        table.insert(groups, { name = cleaned_name, layers = { layer } })
+        count = count + 1
       end
     end
   end
