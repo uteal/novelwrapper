@@ -90,7 +90,7 @@ end
 --- @param str string: Layer name.
 --- @return string: Sprite name.
 --- @return integer: Sprite type.
---- @return number: Sprite frame rate as a percentage of normal.
+--- @return integer: Sprite frame rate as a percentage of normal.
 --- @return integer: Sprite offset in pixels.
 local function parseLayerName(str)
   local first, last = str:find("<[^>]*>")
