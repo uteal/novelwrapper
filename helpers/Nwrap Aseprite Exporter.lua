@@ -14,11 +14,10 @@
 -- Script will IGNORE:
 -- 1) Hidden layers and hidden groups.
 -- 2) Layers and groups whose name contains __ (double underscore).
--- 3) Nested groups (i.e. groups within a group).
 
 -- How it works:
--- Each first-level (not nested) group with one or more visible layers will be converted
--- into a sprite group. Each non-empty image layer will be converted into a sprite in a group.
+-- Each first-level (non-nested) group with one or more visible layers will be converted into a sprite group.
+-- Each non-empty image layer inside (including those in nested groups) will be converted into a sprite.
 -- First-level image layers become self-containing groups with one sprite inside.
 
 -- Passing additional params:
