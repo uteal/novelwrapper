@@ -24,25 +24,25 @@
 -- Passing additional params:
 -- You can pass additional information about the sprite, which will be reflected in the JSON file or will affect the
 -- saved spritesheet. Additional parameters are written in angle brackets after the layer name, separated by commas.
--- 1st param: Type. For custom use, 0 by default, will be saved in JSON file.
--- 2nd param: FrameRate. For custom use, 100 (percents) by default, will be saved in JSON file after division by 100.
--- 3rd param: Offset. How much pixels (0 by default) should be left at the edges of the frames. Affects the resulting sheet.
+-- 1st param: Type (number). For custom use, 0 by default, will be saved in JSON file.
+-- 2nd param: Flag (string). For custom use, empty string by default, will be trimmed and saved in JSON file. Can contain any characters except "<", ">" and ",".
+-- 3rd param: Offset (number). How much pixels (0 by default) should be left at the edges of the frames. Affects the resulting sheet.
 
 -- There are also two shortcuts introduced specifically for the NovelWrapper engine (you are not forced to use them).
 -- # in place of the first parameter sets Type to 1 and Offset to 1.
 -- @ in place of the first parameter sets Type to 2 and Offset to 1.
 
 -- Example layer names:
---   mossy_stone <0, 100, 0> -- Type = 0, FrameRate = 100%, Offset = 0. Sprite name will be "mossy_stone".
---   mossy_stone <,100,>     -- The same.
+--   mossy_stone <0, , 0>    -- Type = 0, Flag = "", Offset = 0. Sprite name will be "mossy_stone".
+--   mossy_stone <,,>        -- The same.
 --   mossy_stone <>          -- The same.
 --   mossy_stone             -- The same.
---   hummingbird <1, 200>    -- Type = 1, FrameRate = 200%, Offset = 0. Sprite name will be "hummingbird".
---   hummingbird <#, 200>    -- Type = 1, FrameRate = 200%, Offset = 1. Same name.
---   hummingbird <@, 200>    -- Type = 2, FrameRate = 200%, Offset = 1. Same name.
---   fruit tree  < ,  50>    -- Type = 0, FrameRate =  50%, Offset = 0. Sprite name will be "fruit tree".
---   clouds      <#>         -- Type = 1, FrameRate = 100%, Offset = 1. Sprite name will be "clouds".
---   b a n a n a<7,,3>       -- Type = 7, FrameRate = 100%, Offset = 3. Sprite name will be "b a n a n a".
+--   hummingbird <1, quick>  -- Type = 1, Flag = "quick", Offset = 0. Sprite name will be "hummingbird".
+--   hummingbird <#, quick>  -- Type = 1, Flag = "quick", Offset = 1. Same sprite name.
+--   puppy <@, fluffy:noisy> -- Type = 2, Flag = "fluffy:noisy", Offset = 1. Sprite name will be "puppy".
+--   fruit tree  < ,  green> -- Type = 0, Flag = "green", Offset = 0. Sprite name will be "fruit tree".
+--   clouds      <#>         -- Type = 1, Flag = "", Offset = 1. Sprite name will be "clouds".
+--   b a n a n a<7,,3>       -- Type = 7, Flag = "", Offset = 3. Sprite name will be "b a n a n a".
 --   __background            -- IGNORED because of double underscore.
 --   mossy__stone            -- IGNORED as well, so be careful.
 
@@ -53,7 +53,10 @@
 --   located, with the same name as the file (without ".aseprite" extension).
 --   2) Don't be afraid of copy-pasting your sprites: sprites with identical frames will refer to
 --   the same spritesheet, differing only in additional parameters inside JSON file.
---   3) For security reasons, the script does not clear the entire folder where it writes images.
+--   3) The latter also applies to duplicating the same image in different frames of the same sprite.
+--   If the images in different frames do not differ, or differ only in position, this will not lead
+--   to spritesheet bloating.
+--   4) For security reasons, the script does not clear the entire folder where it writes images.
 --   So, if necessary, take care of this yourself.
 
 local sprite = app.activeSprite
@@ -93,7 +96,7 @@ end
 --- @param str string: Layer name.
 --- @return string: Sprite name.
 --- @return integer: Sprite type.
---- @return integer: Sprite frame rate as a percentage of normal.
+--- @return string: Sprite flag.
 --- @return integer: Sprite offset in pixels.
 local function parseLayerName(str)
   local first, last = str:find("<[^>]*>")
@@ -106,7 +109,7 @@ local function parseLayerName(str)
     tag = tag:gsub("^%s+", ""):gsub("%s+$", "")
     table.insert(arr, tag)
   end
-  local spr_type, frame_rate, offset
+  local spr_type, flag_string, offset
   if arr[1] == "#" then
     spr_type = 1
     offset = 1
@@ -117,8 +120,8 @@ local function parseLayerName(str)
     spr_type = tonumber(arr[1]) or 0
     offset = tonumber(arr[3]) or 0
   end
-  frame_rate = tonumber(arr[2]) or 100
-  return spr_name, spr_type, frame_rate, offset
+  flag_string = (arr[2] or ""):gsub("^%s+", ""):gsub("%s+$", "")
+  return spr_name, spr_type, flag_string, offset
 end
 
 --- Checks whether the given string is a valid layer name.
@@ -165,6 +168,18 @@ local function chooseSpriteSheetGrid(count, ratio)
     rows = math.ceil(count / cols)
   end
   return rows, cols
+end
+
+--- If there is already frame with the same image, returns its number.
+--- @param cel table
+--- @param cels table
+--- @return integer|nil
+local function getSameFrameNum(cel, cels)
+  for n, c in ipairs(cels) do
+    if c.image:isEqual(cel.image) then
+      return n - 1
+    end
+  end
 end
 
 --- If there is already given image in images, returns its filename.
@@ -238,7 +253,7 @@ for _, group in ipairs(groups) do
 
   for _, layer in ipairs(layers) do
 
-    local sprite_name, sprite_type, frame_rate, offset = parseLayerName(layer.name)
+    local sprite_name, sprite_type, flag_string, offset = parseLayerName(layer.name)
     local filename
     do
       local count = filenames[sprite_name]
@@ -252,12 +267,46 @@ for _, group in ipairs(groups) do
       filenames[sprite_name] = count
     end
 
+    local spec = {
+      name = sprite_name,
+      type = sprite_type,
+      flagStr = flag_string,
+      filename = filename,
+      frames = #layer.cels,
+      uniqueFrames = nil,
+      frameWidth = nil,
+      frameHeight = nil,
+      rows = nil,
+      cols = nil,
+      framesOrder = {},
+      framesCoords = {}
+    }
+
+    table.insert(atlas.sprites, spec)
+    table.insert(atlas.groups[#atlas.groups].sprites, #atlas.sprites - 1)
+
+    local unique_cels = {}
+
+    for _, cel in ipairs(layer.cels) do
+      if cel ~= nil then
+        local n = getSameFrameNum(cel, unique_cels)
+        if not n then
+          table.insert(unique_cels, cel)
+          table.insert(spec.framesOrder, #unique_cels - 1)
+        else
+          table.insert(spec.framesOrder, n)
+        end
+      end
+    end
+
+    spec.uniqueFrames = #unique_cels
+
     local top = 1/0
     local left = 1/0
     local right = -1/0
     local bottom = -1/0
 
-    for _, cel in ipairs(layer.cels) do
+    for _, cel in ipairs(unique_cels) do
       local rect = cel.image:shrinkBounds()
       rect.origin = rect.origin + cel.bounds.origin
       if rect.x < left then left = rect.x end
@@ -275,41 +324,32 @@ for _, group in ipairs(groups) do
 
     local width = right - left
     local height = bottom - top
-    local rows, cols = chooseSpriteSheetGrid(#layer.cels, width / height)
 
-    local spec = {
-      name = sprite_name,
-      type = sprite_type,
-      filename = filename,
-      x = left,
-      y = top,
-      frameWidth = width,
-      frameHeight = height,
-      frameRate = frame_rate / 100,
-      frames = #layer.cels,
-      rows = rows,
-      cols = cols
-    }
+    spec.frameWidth = width
+    spec.frameHeight = height
 
-    table.insert(atlas.sprites, spec)
-    table.insert(atlas.groups[#atlas.groups].sprites, #atlas.sprites - 1)
+    local rows, cols = chooseSpriteSheetGrid(#unique_cels, width / height)
+
+    spec.rows = rows
+    spec.cols = cols
 
     local image = Image(width * cols, height * rows)
 
     local j = 1
     for y = 1, rows do
       for x = 1, cols do
-        if layer.cels[j] ~= nil then
-          local b = layer.cels[j].bounds
-          image:drawImage(
-            layer.cels[j].image,
-            Point(
-              (x - 1) * width + (b.x - left),
-              (y - 1) * height + (b.y - top)
-            )
+        local cel = layer.cels[j]
+        if cel == nil then break end
+        local b = cel.bounds
+        table.insert(spec.framesCoords, { x = b.x, y = b.y })
+        image:drawImage(
+          cel.image,
+          Point(
+            (x - 1) * width + (b.x - left),
+            (y - 1) * height + (b.y - top)
           )
-          j = j + 1
-        end
+        )
+        j = j + 1
       end
     end
 
@@ -322,7 +362,7 @@ for _, group in ipairs(groups) do
     end
 
     if #layer.cels > 1 then
-      print(sprite_name .. ": " .. #layer.cels .. " frames, speed " .. frame_rate .. "%")
+      print(sprite_name .. ": " .. #layer.cels .. " frames (" .. #unique_cels .. " unique)")
     else
       print(sprite_name)
     end
