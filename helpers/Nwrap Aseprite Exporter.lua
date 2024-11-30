@@ -252,7 +252,7 @@ for _, group in ipairs(groups) do
     local spec = {
       name = sprite_name,
       flags = flags,
-      source = filename,
+      filename = filename,
       sheet = {
         rows = 0,
         cols = 0,
@@ -340,13 +340,11 @@ for _, group in ipairs(groups) do
 
     local similarImageFilename = findSimilarImageFilename(image, images)
     if similarImageFilename then
-      spec.source = similarImageFilename
+      spec.filename = similarImageFilename
     else
       images[filename] = image
       image:saveAs(path .. slash .. title .. slash .. filename .. ".png")
     end
-
-    spec.source = spec.source .. '.png'
 
     if #layer.cels > 1 then
       print(sprite_name .. ": " .. #layer.cels .. " frames (" .. #unique_cels .. " unique)")
