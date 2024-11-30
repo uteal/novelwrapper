@@ -337,7 +337,7 @@ for _, group in ipairs(groups) do
     local j = 1
     for y = 1, rows do
       for x = 1, cols do
-        local cel = layer.cels[j]
+        local cel = unique_cels[j]
         if cel == nil then break end
         local b = cel.bounds
         table.insert(spec.framesCoords, { x = b.x, y = b.y })
