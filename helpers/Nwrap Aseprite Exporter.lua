@@ -19,31 +19,23 @@
 -- Each first-level (non-nested) group with one or more visible layers will be converted into a sprite group.
 -- Each non-empty image layer inside (including those in nested groups) will be converted into a sprite.
 -- First-level image layers become self-containing groups with one sprite inside.
+-- All sprite frames are saved with an offset of one pixel. To change this, edit the
+-- "offset" variable that comes immediately after the function declaration block.
 
--- Passing additional params:
--- You can pass additional information about the sprite, which will be reflected in the JSON file or will affect the
--- saved spritesheet. Additional parameters are written in angle brackets after the layer name, separated by commas.
--- 1st param: Type (number). For custom use, 0 by default, will be saved in JSON file.
--- 2nd param: Flag (string). For custom use, empty string by default, will be trimmed and saved in JSON file. Can contain any characters except "<", ">" and ",".
--- 3rd param: Offset (number). How much pixels (0 by default) should be left at the edges of the frames. Affects the resulting sheet.
-
--- There are also two shortcuts introduced specifically for the NovelWrapper engine (you are not forced to use them).
--- # in place of the first parameter sets Type to 1 and Offset to 1.
--- @ in place of the first parameter sets Type to 2 and Offset to 1.
+-- Passing custom flags:
+-- You can pass additional information about the sprite, which will be reflected in the JSON file.
+-- Additional parameters (flags) are written after ">>" at the end of layer name, separated by commas.
 
 -- Example layer names:
---   mossy_stone <0, , 0>    -- Type = 0, Flag = "", Offset = 0. Sprite name will be "mossy_stone".
---   mossy_stone <,,>        -- The same.
---   mossy_stone <>          -- The same.
---   mossy_stone             -- The same.
---   hummingbird <1, quick>  -- Type = 1, Flag = "quick", Offset = 0. Sprite name will be "hummingbird".
---   hummingbird <#, quick>  -- Type = 1, Flag = "quick", Offset = 1. Same sprite name.
---   puppy <@, fluffy:noisy> -- Type = 2, Flag = "fluffy:noisy", Offset = 1. Sprite name will be "puppy".
---   fruit tree  < ,  green> -- Type = 0, Flag = "green", Offset = 0. Sprite name will be "fruit tree".
---   clouds      <#>         -- Type = 1, Flag = "", Offset = 1. Sprite name will be "clouds".
---   b a n a n a<7,,3>       -- Type = 7, Flag = "", Offset = 3. Sprite name will be "b a n a n a".
---   __background            -- IGNORED because of double underscore.
---   mossy__stone            -- IGNORED as well, so be careful.
+--   mossy_stone >> decor      -- flags = ["decor"]. Sprite name will be "mossy_stone".
+--   mossy_stone               -- flags = []. Sprite name will be "mossy_stone".
+--   hummingbird >> is fast    -- flags = ["is fast"]. Sprite name will be "hummingbird".
+--   puppy >> fluffy, noisy    -- flags = ["fluffy", "noisy"]. Sprite name will be "puppy".
+--   fruit tree >> ,,green     -- flags = ["", "", "green"]. Sprite name will be "fruit tree".
+--   clouds     >> 0 , 1, 2    -- flags = ["0", "1", "2"]. Sprite name will be "clouds".
+--   b a n a n a>>yeah!        -- flags = ["yeah!"]. Sprite name will be "b a n a n a".
+--   __background              -- IGNORED because of double underscore.
+--   alchemist >> full__metal  -- IGNORED as well, so be careful.
 
 -- Notes:
 --   1) The script will try to create a spritesheet file using the sprite name (+".png"). So do not
@@ -94,33 +86,21 @@ end
 --- Parses the layer name, returning the sprite metadata.
 --- @param str string: Layer name.
 --- @return string: Sprite name.
---- @return integer: Sprite type.
---- @return string: Sprite flag.
---- @return integer: Sprite offset in pixels.
+--- @return table: Array of sprite flags.
 local function parseLayerName(str)
-  local first, last = str:find("<[^>]*>")
+  local first, last = str:find(">>")
   local spr_name = first and str:sub(1, first - 1) or str
   spr_name = spr_name:gsub("^%s+", ""):gsub("%s+$", "")
-  local tags = first and str:sub(first, last) or ""
-  tags = tags:gsub(",", ",,"):gsub("[<>]", ",")
-  local arr = {}
-  for tag in tags:gmatch(",%s*([^,]*)%s*,") do
-    tag = tag:gsub("^%s+", ""):gsub("%s+$", "")
-    table.insert(arr, tag)
+  local flags_str = first and str:sub(last + 1, #str) or ""
+  local flags = {}
+  if #flags_str > 0 then
+    flags_str = "," .. flags_str:gsub(",", ",,") .. ","
+    for flag in flags_str:gmatch(",%s*([^,]*)%s*,") do
+      flag = flag:gsub("^%s+", ""):gsub("%s+$", "")
+      table.insert(flags, flag)
+    end
   end
-  local spr_type, flag_string, offset
-  if arr[1] == "#" then
-    spr_type = 1
-    offset = 1
-  elseif arr[1] == "@" then
-    spr_type = 2
-    offset = 1
-  else
-    spr_type = tonumber(arr[1]) or 0
-    offset = tonumber(arr[3]) or 0
-  end
-  flag_string = (arr[2] or ""):gsub("^%s+", ""):gsub("%s+$", "")
-  return spr_name, spr_type, flag_string, offset
+  return spr_name, flags
 end
 
 --- Checks whether the given string is a valid layer name.
@@ -204,6 +184,8 @@ end
 
 -- [/declarations]
 
+local offset = 1
+
 local groups = {}
 
 do
@@ -217,7 +199,7 @@ do
           count = count + #image_layers
         end
       elseif layer.isImage and #layer.cels > 0 then
-        local index = layer.name:find("<")
+        local index = layer.name:find(">")
         local cleaned_name = index and layer.name:sub(1, index - 1) or layer.name
         cleaned_name = cleaned_name:gsub("^%s+", ""):gsub("%s+$", "")
         table.insert(groups, { name = cleaned_name, layers = { layer } })
@@ -252,7 +234,7 @@ for _, group in ipairs(groups) do
 
   for _, layer in ipairs(layers) do
 
-    local sprite_name, sprite_type, flag_string, offset = parseLayerName(layer.name)
+    local sprite_name, flags = parseLayerName(layer.name)
     local filename
     do
       local count = filenames[sprite_name]
@@ -263,22 +245,26 @@ for _, group in ipairs(groups) do
         count = count + 1
         filename = sprite_name .. "__" .. count
       end
+      filename = filename
       filenames[sprite_name] = count
     end
 
     local spec = {
       name = sprite_name,
-      type = sprite_type,
-      flagStr = flag_string,
-      filename = filename,
-      frames = #layer.cels,
-      uniqueFrames = nil,
-      frameWidth = nil,
-      frameHeight = nil,
-      rows = nil,
-      cols = nil,
-      framesOrder = {},
-      framesCoords = {}
+      flags = flags,
+      source = filename,
+      sheet = {
+        rows = 0,
+        cols = 0,
+        height = 0,
+        width = 0
+      },
+      frames = {
+        total = 0,
+        unique = 0,
+        order = {},
+        coords = {}
+      }
     }
 
     table.insert(atlas.sprites, spec)
@@ -288,17 +274,18 @@ for _, group in ipairs(groups) do
 
     for _, cel in ipairs(layer.cels) do
       if cel ~= nil then
+        spec.frames.total = spec.frames.total + 1
         local n = getSameFrameNum(cel, unique_cels)
+        local b = cel.bounds
+        table.insert(spec.frames.coords, { b.x, b.y })
+        table.insert(spec.frames.order, n or #unique_cels)
         if not n then
           table.insert(unique_cels, cel)
-          table.insert(spec.framesOrder, #unique_cels - 1)
-        else
-          table.insert(spec.framesOrder, n)
         end
       end
     end
 
-    spec.uniqueFrames = #unique_cels
+    spec.frames.unique = #unique_cels
 
     local top = 1/0
     local left = 1/0
@@ -314,7 +301,7 @@ for _, group in ipairs(groups) do
       if rect.y + rect.height > bottom then bottom = rect.y + rect.height end
     end
 
-    if offset ~= 0 then
+    if offset > 0 then
       left = left - offset
       right = right + offset
       top = top - offset
@@ -323,42 +310,43 @@ for _, group in ipairs(groups) do
 
     local width = right - left
     local height = bottom - top
-
-    spec.frameWidth = width
-    spec.frameHeight = height
-
     local rows, cols = chooseSpriteSheetGrid(#unique_cels, width / height)
 
-    spec.rows = rows
-    spec.cols = cols
+    spec.sheet.rows = rows
+    spec.sheet.cols = cols
+    spec.sheet.width = width * cols
+    spec.sheet.height = height * rows
 
     local image = Image(width * cols, height * rows)
 
-    local j = 1
-    for y = 1, rows do
-      for x = 1, cols do
-        local cel = unique_cels[j]
-        if cel == nil then break end
-        local b = cel.bounds
-        table.insert(spec.framesCoords, { x = b.x, y = b.y })
-        image:drawImage(
-          cel.image,
-          Point(
-            (x - 1) * width + (b.x - left),
-            (y - 1) * height + (b.y - top)
+    do
+      local i = 1
+      for y = 1, rows do
+        for x = 1, cols do
+          local cel = unique_cels[i]
+          if cel == nil then break end
+          local b = cel.bounds
+          image:drawImage(
+            cel.image,
+            Point(
+              (x - 1) * width + (b.x - left),
+              (y - 1) * height + (b.y - top)
+            )
           )
-        )
-        j = j + 1
+          i = i + 1
+        end
       end
     end
 
     local similarImageFilename = findSimilarImageFilename(image, images)
     if similarImageFilename then
-      spec.filename = similarImageFilename
+      spec.source = similarImageFilename
     else
       images[filename] = image
       image:saveAs(path .. slash .. title .. slash .. filename .. ".png")
     end
+
+    spec.source = spec.source .. '.png'
 
     if #layer.cels > 1 then
       print(sprite_name .. ": " .. #layer.cels .. " frames (" .. #unique_cels .. " unique)")
