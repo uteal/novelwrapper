@@ -76,7 +76,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     // An example of using the "print" function. This is similar to a character speech, except the syntax is less free:
     // messages must be enclosed in parentheses and separated by commas, like normal function parameters.
-    await print("(Click on the tavern's door.)", 0) // The second argument is for auto-proceeding, this will be explained later.
+    await print("Click on the tavern's door.", 0) // The second argument is for auto-proceeding, this will be explained later.
 
     // Before the current scene comes to an end and Raven is removed from the screen, let's do one more thing.
     // Here is how to add a watcher. Watchers are used to handle events that can be sent into the novel
