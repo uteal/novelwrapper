@@ -252,7 +252,7 @@ for _, group in ipairs(groups) do
     local spec = {
       name = sprite_name,
       flags = flags,
-      filename = filename,
+      source = filename,
       sheet = {
         rows = 0,
         cols = 0,
@@ -340,7 +340,7 @@ for _, group in ipairs(groups) do
 
     local similarImageFilename = findSimilarImageFilename(image, images)
     if similarImageFilename then
-      spec.filename = similarImageFilename
+      spec.source = similarImageFilename
     else
       images[filename] = image
       image:saveAs(path .. slash .. title .. slash .. filename .. ".png")
