@@ -215,8 +215,10 @@ end
 
 local path, title, slash = parseFileName(sprite.filename)
 local atlas = {
-  _width = sprite.width,
-  _height = sprite.height,
+  screen = {
+    width = sprite.width,
+    height = sprite.height
+  },
   groups = {},
   sprites = {}
 }
@@ -254,16 +256,15 @@ for _, group in ipairs(groups) do
       flags = flags,
       source = filename,
       sheet = {
-        rows = 0,
-        cols = 0,
+        width = 0,
         height = 0,
-        width = 0
+        rows = 0,
+        cols = 0
       },
       frames = {
-        total = 0,
         unique = 0,
         order = {},
-        coords = {}
+        shift = {}
       }
     }
 
@@ -274,11 +275,10 @@ for _, group in ipairs(groups) do
 
     for _, cel in ipairs(layer.cels) do
       if cel ~= nil then
-        spec.frames.total = spec.frames.total + 1
         local n = getSameFrameNum(cel, unique_cels)
         local b = cel.bounds
-        table.insert(spec.frames.coords, { b.x, b.y })
         table.insert(spec.frames.order, n or #unique_cels)
+        table.insert(spec.frames.shift, { b.x, b.y })
         if not n then
           table.insert(unique_cels, cel)
         end
@@ -308,16 +308,16 @@ for _, group in ipairs(groups) do
       bottom = bottom + offset
     end
 
-    local width = right - left
-    local height = bottom - top
-    local rows, cols = chooseSpriteSheetGrid(#unique_cels, width / height)
+    local frame_width = right - left
+    local frame_height = bottom - top
+    local rows, cols = chooseSpriteSheetGrid(#unique_cels, frame_width / frame_height)
 
     spec.sheet.rows = rows
     spec.sheet.cols = cols
-    spec.sheet.width = width * cols
-    spec.sheet.height = height * rows
+    spec.sheet.width = frame_width * cols
+    spec.sheet.height = frame_height * rows
 
-    local image = Image(width * cols, height * rows)
+    local image = Image(frame_width * cols, frame_height * rows)
 
     do
       local i = 1
@@ -329,8 +329,8 @@ for _, group in ipairs(groups) do
           image:drawImage(
             cel.image,
             Point(
-              (x - 1) * width + (b.x - left),
-              (y - 1) * height + (b.y - top)
+              (x - 1) * frame_width + (b.x - left),
+              (y - 1) * frame_height + (b.y - top)
             )
           )
           i = i + 1
@@ -355,6 +355,14 @@ for _, group in ipairs(groups) do
   end
 end
 
+do
+  local count = 0
+  for _ in pairs(images) do
+    count = count + 1
+  end
+  print("\nPNG sheets created: " .. count)
+end
+
 local file = io.open(path .. slash .. title .. slash .. "atlas.json", "w")
 
 if file ~= nil then
@@ -362,4 +370,4 @@ if file ~= nil then
   file:close()
 end
 
-print("\nAtlas file created. All done.")
+print("\nJSON file written. All done.")
