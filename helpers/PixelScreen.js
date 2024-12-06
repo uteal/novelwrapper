@@ -7,7 +7,8 @@ export default class PixelScreen {
     spritePath = './sprites/',
     minPixelSize = 2,
     maxPixelSize = 4,
-    frameTime = 250
+    frameTime = 250,
+    onClick = async (_spriteName, _groupName) => { }
   } = {}) {
     this.init = async () => {
       spritePath = spritePath + (spritePath.at(-1) !== '/' ? '/' : '');
@@ -25,7 +26,7 @@ export default class PixelScreen {
       let renderingGroup = null;
       let pixelSprites = [];
 
-      const onClick = function({ offsetX, offsetY }) {
+      const handler = async function({ offsetX, offsetY }) {
         const { width, height } = this.getBoundingClientRect();
         const x = Math.floor(offsetX * screen.width / width);
         const y = Math.floor(offsetY * screen.height / height);
@@ -33,17 +34,17 @@ export default class PixelScreen {
           for (let i = renderingGroup.sprites.length - 1; i >= 0; i--) {
             const pxSpr = pixelSprites[renderingGroup.sprites[i]];
             if (pxSpr.checkIntersection(x, y)) {
-              console.log(pxSpr.name);
+              await onClick?.(pxSpr.name, renderingGroup.name);
               break;
             }
           }
         }
       };
 
-      canvas1.addEventListener('mousedown', onClick);
-      canvas2.addEventListener('mousedown', onClick);
-      canvas1.addEventListener('touchstart', onClick);
-      canvas2.addEventListener('touchstart', onClick);
+      canvas1.addEventListener('mousedown', handler);
+      canvas2.addEventListener('mousedown', handler);
+      canvas1.addEventListener('touchstart', handler);
+      canvas2.addEventListener('touchstart', handler);
 
       for (const spec of sprites) {
         pixelSprites.push(new PixelSprite({
@@ -79,10 +80,10 @@ export default class PixelScreen {
         },
         onBeforeDestroy: () => {
           clearInterval(intervalId);
-          canvas1.removeEventListener('mousedown', onClick);
-          canvas2.removeEventListener('mousedown', onClick);
-          canvas1.removeEventListener('touchstart', onClick);
-          canvas2.removeEventListener('touchstart', onClick);
+          canvas1.removeEventListener('mousedown', handler);
+          canvas2.removeEventListener('mousedown', handler);
+          canvas1.removeEventListener('touchstart', handler);
+          canvas2.removeEventListener('touchstart', handler);
           canvas1.remove();
           canvas2.remove();
         }
