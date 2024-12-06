@@ -15,6 +15,8 @@ export default class ScreenSwitcher {
   #visible = false;
   #onBeforeScreenShow;
   #onAfterScreenHide;
+  #onAfterCreate;
+  #onBeforeDestroy;
 
   /**
    * Provides smooth switching between screens.
@@ -25,6 +27,8 @@ export default class ScreenSwitcher {
    * @param {(string|HTMLElement)} params.appendTo Where the element should be placed. Defaults to document.body.
    * @param {function} params.onBeforeScreenShow Fires before the screen starts to appear. Receives the screen name and its html element.
    * @param {function} params.onAfterScreenHide Fires after the screen disappears. There are only two actual screen elements, so be careful.
+   * @param {function} params.onAfterCreate Fires after the switcher instance created. Receives both screen elements.
+   * @param {function} params.onBeforeDestroy Fires before the switcher instance destroyed. Receives both screen elements.
    * @returns {ScreenSwitcher}
    * @example
    *    const bg = new ScreenSwitcher()
@@ -41,13 +45,17 @@ export default class ScreenSwitcher {
     transitionTime = 1000,
     appendTo = document.body,
     onBeforeScreenShow = async (_name, _elem) => { },
-    onAfterScreenHide = async (_name, _elem) => { }
+    onAfterScreenHide = async (_name, _elem) => { },
+    onAfterCreate = (_first, _last) => { },
+    onBeforeDestroy = (_first, _last) => { }
   } = {}) {
     this.#switchOnly = switchOnly;
     this.#searchTemplate = searchTemplate;
     this.#transitionTime = transitionTime;
     this.#onBeforeScreenShow = onBeforeScreenShow;
     this.#onAfterScreenHide = onAfterScreenHide;
+    this.#onAfterCreate = onAfterCreate;
+    this.#onBeforeDestroy = onBeforeDestroy;
     this.#element = document.createElement('div');
     this.#element.style.position = 'absolute';
     this.#element.style.inset = '0';
@@ -68,12 +76,20 @@ export default class ScreenSwitcher {
     } else {
       appendTo.append(this.#element);
     }
+    this.#onAfterCreate?.(
+      this.#element.firstChild,
+      this.#element.lastChild
+    );
     return new Proxy(this, {
       get: (target, prop) => {
         if (target.#exited) {
           return;
         }
         if (prop === target.#exit) {
+          this.#onBeforeDestroy?.(
+            this.#element.firstChild,
+            this.#element.lastChild
+          );
           target.#destroy();
           return;
         }

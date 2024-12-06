@@ -136,7 +136,8 @@ export default class PixelSprite {
   }
 
   checkIntersection(x, y) {
-    return this.ctx.getImageData(x, y, 1, 1).data[3] !== 0;
+    const [sx, sy] = this.frames.shift[this.curFrameNum];
+    return this.ctx.getImageData(x - sx, y - sy, 1, 1).data[3] !== 0;
   }
 
   #makeCanvas() {

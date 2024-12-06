@@ -9,8 +9,8 @@ export default class PixelScreen {
     maxPixelSize = 4,
     frameTime = 250
   } = {}) {
-    spritePath = spritePath + (spritePath.at(-1) !== '/' ? '/' : '');
     this.init = async () => {
+      spritePath = spritePath + (spritePath.at(-1) !== '/' ? '/' : '');
       const response = await fetch(spritePath + 'atlas.json');
       const { screen, groups, sprites } = await response.json();
 
@@ -21,51 +21,79 @@ export default class PixelScreen {
 
       this.canvas = canvas1;
       this.ctx = ctx1;
+      let intervalId = -1;
+      let renderingGroup = null;
+      let pixelSprites = [];
 
-      let renderingGroup;
-
-      this.bg = new ScreenSwitcher({
-        switchOnly: true,
-        onBeforeScreenShow: async (name, elem) => {
-          this.canvas = this.canvas === canvas1 ? canvas2 : canvas1;
-          this.ctx = this.ctx === ctx1 ? ctx2 : ctx1;
-          renderingGroup = groups.find(group => group.name === name);
-          if (renderingGroup) {
-            this.#render(renderingGroup, true);
-            elem.append(this.canvas);
-          } else {
-            console.error('Unknown sprite group:', name);
+      const onClick = function({ offsetX, offsetY }) {
+        const { width, height } = this.getBoundingClientRect();
+        const x = Math.floor(offsetX * screen.width / width);
+        const y = Math.floor(offsetY * screen.height / height);
+        if (renderingGroup) {
+          for (let i = renderingGroup.sprites.length - 1; i >= 0; i--) {
+            const pxSpr = pixelSprites[renderingGroup.sprites[i]];
+            if (pxSpr.checkIntersection(x, y)) {
+              console.log(pxSpr.name);
+              break;
+            }
           }
-        },
-        onAfterScreenHide: async (_name, elem) => {
-          elem.replaceChildren();
         }
-      });
+      };
 
-      this.pixelSprites = [];
+      canvas1.addEventListener('mousedown', onClick);
+      canvas2.addEventListener('mousedown', onClick);
+      canvas1.addEventListener('touchstart', onClick);
+      canvas2.addEventListener('touchstart', onClick);
 
       for (const spec of sprites) {
-        this.pixelSprites.push(new PixelSprite({
+        pixelSprites.push(new PixelSprite({
           ...spec,
           source: spritePath + spec.source + '.png'
         }).ready);
       }
-      this.pixelSprites = await Promise.all(this.pixelSprites);
 
-      this.intervalId = setInterval(() => {
-        if (renderingGroup) {
-          this.#render(renderingGroup);
+      pixelSprites = await Promise.all(pixelSprites);
+
+      // Reminder: The proxy object should not be returned directly from the async function.
+      // Due to the way the await works, this results in a .then() call on the proxy object.
+      return { screen: new ScreenSwitcher({
+        switchOnly: true,
+        onAfterCreate: (bottomElem, topElem) => {
+          topElem.append(canvas1);
+          bottomElem.append(canvas2);
+        },
+        onBeforeScreenShow: (name, _elem) => {
+          console.log('onBeforeScreenShow:', name);
+          this.canvas = this.canvas === canvas1 ? canvas2 : canvas1;
+          this.ctx = this.ctx === ctx1 ? ctx2 : ctx1;
+          clearInterval(intervalId);
+          renderingGroup = groups.find(group => group.name === name);
+          if (renderingGroup) {
+            this.#render(renderingGroup, pixelSprites, true);
+            intervalId = setInterval(() => {
+              this.#render(renderingGroup, pixelSprites);
+            }, frameTime);
+          } else {
+            console.error('Unknown sprite group:', name);
+          }
+        },
+        onBeforeDestroy: () => {
+          clearInterval(intervalId);
+          canvas1.removeEventListener('mousedown', onClick);
+          canvas2.removeEventListener('mousedown', onClick);
+          canvas1.removeEventListener('touchstart', onClick);
+          canvas2.removeEventListener('touchstart', onClick);
+          canvas1.remove();
+          canvas2.remove();
         }
-      }, frameTime);
-
-      return this;
+      })};
     };
   }
 
-  #render(group, resetFrames = false) {
+  #render(group, pxSprites, resetFrames = false) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     for (const num of group.sprites) {
-      const pxSpr = this.pixelSprites[num];
+      const pxSpr = pxSprites[num];
       if (resetFrames) {
         pxSpr.resetFrames();
       } else {
