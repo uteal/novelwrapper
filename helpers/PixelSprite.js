@@ -59,6 +59,8 @@ export default class PixelSprite {
 
     this.isActive = !!this.outlineColor;
     this.isOutlined = false;
+    this.isVisibleByDefault = !this.flags.includes('#hidden');
+    this.isVisible = this.isVisibleByDefault;
 
     const fw = sheet.width / sheet.cols;
     const fh = sheet.height / sheet.rows;
@@ -114,6 +116,12 @@ export default class PixelSprite {
     this.curFrameNum = 0;
   }
 
+  reset() {
+    this.curFrameNum = 0;
+    this.setOutline(false);
+    this.setVisibility(this.isVisibleByDefault);
+  }
+
   getDrawImageArgs() {
     const n = this.curFrameNum;
     const [x, y, w, h] = this.frameRects[this.frames.order[n]];
@@ -123,16 +131,14 @@ export default class PixelSprite {
     ];
   }
 
-  setOutline() {
+  setOutline(val) {
     if (this.isActive) {
-      this.isOutlined = true;
+      this.isOutlined = !!val;
     }
   }
 
-  clearOutline() {
-    if (this.isActive) {
-      this.isOutlined = false;
-    }
+  setVisibility(val) {
+    this.isVisible = !!val;
   }
 
   checkIntersection(x, y) {

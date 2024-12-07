@@ -25,18 +25,18 @@ export default class PixelScreen {
       let intervalId = -1;
       let renderingGroup = null;
       let pixelSprites = [];
+      const getSprites = () => (renderingGroup?.sprites ?? []).map(n => pixelSprites[n]);
 
       const handler = async function({ offsetX, offsetY }) {
         const { width, height } = this.getBoundingClientRect();
         const x = Math.floor(offsetX * screen.width / width);
         const y = Math.floor(offsetY * screen.height / height);
-        if (renderingGroup) {
-          for (let i = renderingGroup.sprites.length - 1; i >= 0; i--) {
-            const pxSpr = pixelSprites[renderingGroup.sprites[i]];
-            if (pxSpr.checkIntersection(x, y)) {
-              await onClick?.(pxSpr.name, renderingGroup.name);
-              break;
-            }
+        const sprites = getSprites();
+        for (let i = sprites.length - 1; i >= 0; i--) {
+          const spr = sprites[i];
+          if (spr.isVisible && spr.checkIntersection(x, y)) {
+            await onClick?.(spr.name, renderingGroup.name);
+            break;
           }
         }
       };
@@ -55,50 +55,56 @@ export default class PixelScreen {
 
       pixelSprites = await Promise.all(pixelSprites);
 
-      return new ScreenSwitcher({
-        switchOnly: true,
-        onAfterCreate: (bottomElem, topElem) => {
-          topElem.append(canvas1);
-          bottomElem.append(canvas2);
+      return {
+        spr: (name) => {
+          return getSprites().find(spr => spr.name === name);
         },
-        onBeforeScreenShow: (name, _elem) => {
-          this.canvas = this.canvas === canvas1 ? canvas2 : canvas1;
-          this.ctx = this.ctx === ctx1 ? ctx2 : ctx1;
-          clearInterval(intervalId);
-          renderingGroup = groups.find(group => group.name === name);
-          if (renderingGroup) {
-            this.#render(renderingGroup, pixelSprites, true);
-            intervalId = setInterval(() => {
-              this.#render(renderingGroup, pixelSprites);
-            }, frameTime);
-          } else {
-            console.error('Unknown sprite group:', name);
+        show: new ScreenSwitcher({
+          switchOnly: true,
+          onAfterCreate: (bottomElem, topElem) => {
+            topElem.append(canvas1);
+            bottomElem.append(canvas2);
+          },
+          onBeforeScreenShow: (name, _elem) => {
+            this.canvas = this.canvas === canvas1 ? canvas2 : canvas1;
+            this.ctx = this.ctx === ctx1 ? ctx2 : ctx1;
+            clearInterval(intervalId);
+            renderingGroup = groups.find(group => group.name === name);
+            if (renderingGroup) {
+              const sprites = getSprites();
+              sprites.forEach(spr => spr.reset());
+              console.log(sprites);
+              window.sprites = sprites;
+              this.#render(sprites);
+              intervalId = setInterval(() => {
+                sprites.forEach(spr => spr.nextFrame());
+                this.#render(sprites);
+              }, frameTime);
+            } else {
+              console.error('Unknown sprite group:', name);
+            }
+          },
+          onBeforeDestroy: () => {
+            clearInterval(intervalId);
+            canvas1.removeEventListener('mousedown', handler);
+            canvas2.removeEventListener('mousedown', handler);
+            canvas1.removeEventListener('touchstart', handler);
+            canvas2.removeEventListener('touchstart', handler);
+            canvas1.remove();
+            canvas2.remove();
           }
-        },
-        onBeforeDestroy: () => {
-          clearInterval(intervalId);
-          canvas1.removeEventListener('mousedown', handler);
-          canvas2.removeEventListener('mousedown', handler);
-          canvas1.removeEventListener('touchstart', handler);
-          canvas2.removeEventListener('touchstart', handler);
-          canvas1.remove();
-          canvas2.remove();
-        }
-      });
+        })
+      };
     };
   }
 
-  #render(group, pxSprites, resetFrames = false) {
+  #render(sprites) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    for (const num of group.sprites) {
-      const pxSpr = pxSprites[num];
-      if (resetFrames) {
-        pxSpr.resetFrames();
-      } else {
-        pxSpr.nextFrame();
+    sprites.forEach((spr) => {
+      if (spr.isVisible) {
+        this.ctx.drawImage(...spr.getDrawImageArgs());
       }
-      this.ctx.drawImage(...pxSpr.getDrawImageArgs());
-    }
+    });
   }
 
   #makeCanvas({ width, height }, minPixelSize, maxPixelSize) {
