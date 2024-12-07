@@ -3,7 +3,6 @@ export default class ScreenSwitcher {
 
   #none = '__none__';
   #prev = '__prev__';
-  #exit = '__exit__';
   #exited = false;
   #switchOnly;
   #searchTemplate;
@@ -31,13 +30,15 @@ export default class ScreenSwitcher {
    * @param {function} params.onBeforeDestroy Fires before the switcher instance destroyed. Receives both screen elements.
    * @returns {ScreenSwitcher}
    * @example
-   *    const bg = new ScreenSwitcher()
-   *    bg.seashore       // Show screen with background image "./screens/seashore.jpg".
-   *    await bg.seashore // The same, but wait until the screen appears completely.
-   *    await bg.mountain // Switch to screen "./screens/mountain.jpg".
-   *    await bg.__prev__ // Switch back to "seashore".
-   *    await bg.__none__ // Switch to no screen.
-   *    bg.__exit__       // Destroy the ScreenSwitcher instance and remove its element.
+   *    const show = new ScreenSwitcher()
+   *    show("seashore")       // Show screen with background image "./screens/seashore.jpg".
+   *    await show("seashore") // The same, but wait until the screen appears completely.
+   *    await show("mountain") // Switch to screen "./screens/mountain.jpg".
+   *    await show("__prev__") // Switch back to the previous screen (i.e. "seashore").
+   *    await show("__none__") // Switch to no screen.
+   *    await show.prev()      // Shortcut for `await show("__prev__")`.
+   *    await show.none()      // Shortcut for `await show("__none__")`.
+   *    show.exit()            // Destroy the ScreenSwitcher instance and remove its element.
    */
   constructor({
     switchOnly = false,
@@ -80,22 +81,25 @@ export default class ScreenSwitcher {
       this.#element.firstChild,
       this.#element.lastChild
     );
-    return new Proxy(this, {
-      get: (target, prop) => {
-        if (target.#exited) {
-          return;
-        }
-        if (prop === target.#exit) {
-          this.#onBeforeDestroy?.(
-            this.#element.firstChild,
-            this.#element.lastChild
-          );
-          target.#destroy();
-          return;
-        }
-        return target.#setScreen(prop);
+    const f = (name) => {
+      if (this.#exited) {
+        return;
       }
-    });
+      return this.#setScreen(name);
+    };
+    f.none = () => f(this.#none);
+    f.prev = () => f(this.#prev);
+    f.exit = () => {
+      if (this.#exited) {
+        return;
+      }
+      this.#onBeforeDestroy?.(
+        this.#element.firstChild,
+        this.#element.lastChild
+      );
+      this.#destroy();
+    };
+    return f;
   }
 
   async #setScreen(name) {

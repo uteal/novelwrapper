@@ -55,16 +55,13 @@ export default class PixelScreen {
 
       pixelSprites = await Promise.all(pixelSprites);
 
-      // Reminder: The proxy object should not be returned directly from the async function.
-      // Due to the way the await works, this results in a .then() call on the proxy object.
-      return { screen: new ScreenSwitcher({
+      return new ScreenSwitcher({
         switchOnly: true,
         onAfterCreate: (bottomElem, topElem) => {
           topElem.append(canvas1);
           bottomElem.append(canvas2);
         },
         onBeforeScreenShow: (name, _elem) => {
-          console.log('onBeforeScreenShow:', name);
           this.canvas = this.canvas === canvas1 ? canvas2 : canvas1;
           this.ctx = this.ctx === ctx1 ? ctx2 : ctx1;
           clearInterval(intervalId);
@@ -87,7 +84,7 @@ export default class PixelScreen {
           canvas1.remove();
           canvas2.remove();
         }
-      })};
+      });
     };
   }
 
