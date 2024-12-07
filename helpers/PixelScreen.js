@@ -73,8 +73,6 @@ export default class PixelScreen {
             if (renderingGroup) {
               const sprites = getSprites();
               sprites.forEach(spr => spr.reset());
-              console.log(sprites);
-              window.sprites = sprites;
               this.#render(sprites);
               intervalId = setInterval(() => {
                 sprites.forEach(spr => spr.nextFrame());
