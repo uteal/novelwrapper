@@ -74,9 +74,11 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // Actually, it may be safer not to use semicolons at the end of lines unless necessary, to avoid accidentally
     // splitting parentheses-less calls. Again: if you feel unsure, the second notation is perfectly fine.
 
-    // An example of using the "print" function. This is similar to a character speech, except the syntax is less free:
-    // messages must be enclosed in parentheses and separated by commas, like normal function parameters.
+    // An example of using the "print" function. Its syntax is less free: only the second notation is supported.
     await print("Click on the tavern's door.", 0) // The second argument is for auto-proceeding, this will be explained later.
+
+    // [NOTE] Text printed by the "print" function is "sticky": it can only be removed
+    // by calling the "clear" function or by overwriting it with the character's speech.
 
     // Before the current scene comes to an end and Raven is removed from the screen, let's do one more thing.
     // Here is how to add a watcher. Watchers are used to handle events that can be sent into the novel
