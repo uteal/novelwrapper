@@ -23,19 +23,19 @@
 -- "offset" variable that comes immediately after the function declaration block.
 
 -- Passing custom flags:
--- You can pass additional information about the sprite, which will be reflected in the JSON file.
--- Additional parameters (flags) are written after ">>" at the end of layer name, separated by commas.
+-- You can pass additional information about the sprite, which will be reflected inside the JSON file.
+-- Additional parameters (flags) should be written after the layer name and prefixed with "#" or "--".
 
 -- Example layer names:
---   mossy_stone >> decor      -- flags = ["decor"]. Sprite name will be "mossy_stone".
---   mossy_stone               -- flags = []. Sprite name will be "mossy_stone".
---   hummingbird >> is fast    -- flags = ["is fast"]. Sprite name will be "hummingbird".
---   puppy >> fluffy, noisy    -- flags = ["fluffy", "noisy"]. Sprite name will be "puppy".
---   fruit tree >> ,,green     -- flags = ["", "", "green"]. Sprite name will be "fruit tree".
---   clouds     >> 0 , 1, 2    -- flags = ["0", "1", "2"]. Sprite name will be "clouds".
---   b a n a n a>>yeah!        -- flags = ["yeah!"]. Sprite name will be "b a n a n a".
---   __background              -- IGNORED because of double underscore.
---   alchemist >> full__metal  -- IGNORED as well, so be careful.
+--   mossy_stone #decoration   <- flags = ["decoration"]. Sprite name will be "mossy_stone".
+--   mossy_stone               <- flags = []. Sprite name will be "mossy_stone".
+--   hummingbird --is fast     <- flags = ["is fast"]. Sprite name will be "hummingbird".
+--   doge # so sparse # w o w  <- flags = ["so sparse", "w o w"]. Sprite name will be "doge".
+--   fruits--healhy#yummy      <- flags = ["healhy", "yummy"]. Sprite name will be "fruits".
+--   clouds     --0---1--2     <- flags = ["0", "-1", "2"]. Sprite name will be "clouds".
+--   b a n a n a#yeah!         <- flags = ["yeah!"]. Sprite name will be "b a n a n a".
+--   __background              <- IGNORED because of double underscore.
+--   alchemist #full__metal    <- IGNORED as well, so be careful.
 
 -- Notes:
 --   1) The script will try to create a spritesheet file using the sprite name (+".png"). So do not
@@ -88,16 +88,18 @@ end
 --- @return string: Sprite name.
 --- @return table: Array of sprite flags.
 local function parseLayerName(str)
-  local first, last = str:find(">>")
+  str = str:gsub("%-%-", "#")
+  local first = str:find("#")
   local spr_name = first and str:sub(1, first - 1) or str
   spr_name = spr_name:gsub("^%s+", ""):gsub("%s+$", "")
-  local flags_str = first and str:sub(last + 1, #str) or ""
+  local flags_str = first and str:sub(first, #str) or ""
   local flags = {}
   if #flags_str > 0 then
-    flags_str = "," .. flags_str:gsub(",", ",,") .. ","
-    for flag in flags_str:gmatch(",%s*([^,]*)%s*,") do
+    for flag in flags_str:gmatch("#([^#]*)%s*") do
       flag = flag:gsub("^%s+", ""):gsub("%s+$", "")
-      table.insert(flags, flag)
+      if #flag > 0 then
+        table.insert(flags, flag)
+      end
     end
   end
   return spr_name, flags

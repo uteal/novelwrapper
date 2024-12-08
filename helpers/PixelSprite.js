@@ -59,7 +59,7 @@ export default class PixelSprite {
 
     this.isActive = !!this.outlineColor;
     this.isOutlined = false;
-    this.isVisibleByDefault = !this.flags.includes('#hidden');
+    this.isVisibleByDefault = !this.flags.includes('hidden');
     this.isVisible = this.isVisibleByDefault;
 
     const fw = sheet.width / sheet.cols;
