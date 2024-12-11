@@ -11,7 +11,7 @@ export default class PixelScreen {
     onClick = async (_spriteName, _groupName) => { }
   } = {}) {
     this.init = async () => {
-      spritePath = spritePath + (spritePath.at(-1) !== '/' ? '/' : '');
+      spritePath += spritePath.endsWith('/') ? '' : '/';
       const response = await fetch(spritePath + 'atlas.json');
       const { screen, groups, sprites } = await response.json();
 
