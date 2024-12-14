@@ -2,9 +2,9 @@
  * Parses an image with a pixel font, returning a character
  * renderer function and a dictionary for tracking indents.
  * @param {object} params
- * @param {HTMLImageElement} params.image
+ * @param {string} params.source
  * @param {[number, number]} params.cell
- * @param {object} rows
+ * @param {object} params.rows
  * @example
  *  parsePixelFont({
  *    source: './pixelFontSheet.png',
