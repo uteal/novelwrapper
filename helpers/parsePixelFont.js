@@ -6,15 +6,15 @@
  * @param {[number, number]} params.cell
  * @param {string[]} params.rows
  * @example
- *  parsePixelFont({
- *    source: './pixelFontSheet.png',
- *    cell: [8, 8],
- *    rows: [
- *      '0123456789',
- *      'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
- *      'abcdefghijklmnopqrstuvwxyz'
- *    ]
- *  })
+ * const { $, h } = await parsePixelFont({
+ *   source: './pixelFontSheet.png',
+ *   cell: [8, 8],
+ *   rows: [
+ *     '0123456789',
+ *     'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+ *     'abcdefghijklmnopqrstuvwxyz'
+ *   ]
+ * })
  */
 export default async ({ source, cell: [cw, ch] = [8, 8], rows }) => {
   let resolve, reject;
