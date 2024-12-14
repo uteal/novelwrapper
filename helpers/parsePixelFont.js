@@ -4,7 +4,7 @@
  * @param {object} params
  * @param {string} params.source
  * @param {[number, number]} params.cell
- * @param {object} params.rows
+ * @param {string[]} params.rows
  * @example
  *  parsePixelFont({
  *    source: './pixelFontSheet.png',
