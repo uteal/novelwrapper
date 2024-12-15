@@ -87,7 +87,7 @@ const makeRenderFunction = (canvas, dict) => {
       ctx_.drawImage(canvas, 0, 0);
       for (let j = y; j < y + h; j++) {
         for (let i = x; i < x + w; i++) {
-          if (ctx_.getImageData(i, j, 1, 1).data[3] !== 0) {
+          if (ctx_.getImageData(i, j, 1, 1).data[3] === 255) {
             if (a !== 1) {
               ctx_.clearRect(i, j, 1, 1);
             }
