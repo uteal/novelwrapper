@@ -71,7 +71,6 @@ const makeRenderFunction = (canvas, dict) => {
       return [canvas, x, y, w, h, left, top, w, h];
     } else {
       console.error(`Unknown symbol: "${char}"`);
-      return [canvas, 0, 0, 0, 0, 0, 0, 0, 0];
     }
   };
 };
