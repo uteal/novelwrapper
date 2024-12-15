@@ -56,21 +56,44 @@ export default async ({ source, cell: [cw, ch] = [8, 8], rows }) => {
 };
 
 /**
- * @param {HTMLCanvasElement} canvas 
- * @param {object} dict 
+ * @param {HTMLCanvasElement} canvas
+ * @param {object} dict
  */
 const makeRenderFunction = (canvas, dict) => {
+  const { width, height } = canvas;
+  const canvas_ = document.createElement('canvas');
+  canvas_.width = width;
+  canvas_.height = height;
+  const ctx_ = canvas_.getContext('2d', { willReadFrequently: true });
+
   /**
    * @param {string} char
    * @param {number} left
    * @param {number} top
+   * @param {number[]} color
    */
-  return (char, left = 0, top = 0) => {
-    if (Object.hasOwn(dict, char)) {
-      const { x, y, w, h } = dict[char];
+  return (char, left, top, color = undefined) => {
+    if (!Object.hasOwn(dict, char)) {
+      console.error(`Unknown symbol: "${char}"`);
+      return;
+    }
+    const { x, y, w, h } = dict[char];
+    if (!color) {
       return [canvas, x, y, w, h, left, top, w, h];
     } else {
-      console.error(`Unknown symbol: "${char}"`);
+      const [r = 0, g = 0, b = 0, a = 1] = color;
+      ctx_.fillStyle = `rgba(${r},${g},${b},${a})`;
+      ctx_.clearRect(0, 0, width, height);
+      ctx_.drawImage(canvas, 0, 0);
+      for (let j = y; j < y + h; j++) {
+        for (let i = x; i < x + w; i++) {
+          if (ctx_.getImageData(i, j, 1, 1).data[3] !== 0) {
+            if (a !== 1) {
+              ctx_.clearRect(i, j, 1, 1);
+            }
+            ctx_.fillRect(i, j, 1, 1);
+      }}}
+      return [canvas_, x, y, w, h, left, top, w, h];
     }
   };
 };
