@@ -8,6 +8,7 @@ export default class PixelScreen {
     minPixelSize = 2,
     maxPixelSize = 4,
     frameTime = 250,
+    appendTo = document.body,
     onClick = async (_spriteName, _groupName) => { }
   } = {}) {
     this.init = async () => {
@@ -61,6 +62,7 @@ export default class PixelScreen {
         },
         show: new ScreenSwitcher({
           switchOnly: true,
+          appendTo,
           onAfterCreate: (bottomElem, topElem) => {
             topElem.append(canvas1);
             bottomElem.append(canvas2);
