@@ -31,10 +31,10 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // The "$" prefix signals that the method modifies the character's persistent data.
     // For example, a character's name set in one scene will be the same in another.
     Raven
-    //.$flipImage()         // Flip character's portraits horizontally. Not needed here.
-    //.$toRight()           // The default position for a newly created character is right, so this method is not needed here.
-      .$toLeft()            // I'll move Raven to the left side of the screen since he is the main character.
-      .$setName('Wanderer') // A label that will be shown near the character. It can be changed at any time.
+    //.$flipImage()          // Flip character's portraits horizontally. Not needed here.
+    //.$toRight()            // The default position for a newly created character is right, so this method is not needed here.
+      .$toLeft()             // I'll move Raven to the left side of the screen since he is the main character.
+      .$setLabel('Wanderer') // A label that will be shown near the character. It can be changed at any time.
 
     // The character is still invisible. He will appear when he needs to say something.
     // Let's show the landscape of the current scene. This is what our custom function is for.
@@ -50,10 +50,16 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // [NOTE] It is required to put "await" before each speaking character, select(), call(), print() or sleep().
 
     // The character object can be called like a function.
-    await Raven('So the rumors were true.')
+    await Raven('So the rumors were white::true.')
 
     // As you might guess, Raven will say the phrase in parentheses. There is no need
     // to make the speaking character visible or hide the others. Engine takes care of that.
+
+    // There is a built-in way to mark some parts of the text with a custom tag. Here I mark the word
+    // "true" with the tag "white". Tags are just strings, you can add and use them as you wish.
+    // For an example, see the "onType" callback in the init.js file. Allowed syntax:
+    // tag::word
+    // [tag::several words]
 
     await Raven `The awakened portal should be nearby.`
 
@@ -75,7 +81,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // splitting parentheses-less calls. Again: if you feel unsure, the second notation is perfectly fine.
 
     // An example of using the "print" function. Its syntax is less free: only the second notation is supported.
-    await print("Click on the tavern's door.", 0) // The second argument is for auto-proceeding, this will be explained later.
+    await print("Click on the [white::tavern's door].", 0) // The second argument is for auto-proceeding, this will be explained later.
 
     // [NOTE] Text printed by the "print" function is "sticky": it can only be removed
     // by calling the "clear" function or by overwriting it with the character's speech.
@@ -135,12 +141,12 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     clear()
     await sleep(1000)
 
-    Innkeeper.$setName('Innkeeper')
+    Innkeeper.$setLabel('Innkeeper')
     await Innkeeper `Your order.`
 
     // [NOTE] Do not chain method calls and character's speech. They are strictly separated to avoid many problems.
     // The engine will treat the line below as an error:
-    // await Innkeeper('Your order.').$setName('Innkeeper')
+    // await Innkeeper('Your order.').$setLabel('Innkeeper')
 
     if ($.chosen_drink == 'BEER') {
 
@@ -152,7 +158,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     } else {
 
       await Innkeeper
-        `Normally, we don't serve plain water. So it's only out of respect for the path you have overcome...`
+        `Normally, we don't serve [white::plain water]. So it's only out of respect for the path you have overcome...`
         `...judging by the rags you have instead of clothes.`
       await Raven
         `That's... kind of you.`
@@ -175,16 +181,16 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     await Kestrel
       `Hey! Wait a minute.`
       `Am I imagining things, or...`
-      `Is it really you`(500)`[+~], Black Raven?`
+      `Is it really you`(500)`[+~], [blue::Black Raven]?`
     
-    Raven.$setName('Raven')
+    Raven.$setLabel('Raven')
     
     await Raven
       `.`(300)`[+].`(300)`[+].`(800)
       `More like Wingless Raven now.`
-      `But you guessed right`(500)`[+~], Kestrel.`
+      `But you guessed right`(500)`[+~], red::Kestrel.`
     
-    Kestrel.$setName('Kestrel')
+    Kestrel.$setLabel('Kestrel')
 
     await Kestrel
       `Damn, it's true. No one here knows me by that name. I've been just a mechanic for a long time now.`
@@ -289,9 +295,9 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       if ($.FISH == 1 && $.STAR == 1) {
 
         await Raven
-          `There's just one last glyph left to recall, right? Maybe your memory will give us some clue?`
+          `There's just one [white::last glyph] left to recall, right? Maybe your memory will give us some clue?`
         await Kestrel
-          `I think... don't laugh... that this is something related to "Birds of Prey".`
+          `I think... don't laugh... that this is something related to "[white::Birds of Prey]".`
         await Raven
           `...to our former squad? Hmm.`
         
@@ -333,7 +339,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       `I see you have something to share. Is it related to the new portal?`
     
     await Kestrel
-      `Today I managed to decipher the last three glyphs of the guard seal.`
+      `Today I managed to decipher the [white::last three glyphs] of the guard seal.`
       `But then... it's like someone cast a spell of oblivion on me. As if they didn't want the portal to open yet.`
     
     await Raven
@@ -381,7 +387,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       }
       
       await Kestrel
-        `I think I get it. The golden color is from fish, like the ones in the water.`
+        `I think I get it. The golden color is from white::fish, like the ones in the water.`
         `Well, I actually recalled that. Thanks for the walk, it helps.`
         `Let's go somewhere else?`
       
@@ -404,7 +410,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       watch('star', async () => {
         await Kestrel
           `Stars?.. That's right.`
-          `One of the three glyphs I forgot meant the star.`
+          `One of the three glyphs I forgot meant the white::star.`
         await Raven
           `Really? Not very original.`
           `Okay then. It's a bit chilly here. I think we should go back.`
@@ -454,7 +460,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       await Kestrel
         `You mean... I remember. A silly tradition.`
         `But you're right. This is it.`
-        `A leaf caught in the wind was the sign of our squad.`
+        `A [white::leaf caught in the wind] was the sign of our squad.`
       await Raven
         `Just as elusive - and just as short-lived.`
       await Kestrel
@@ -468,9 +474,9 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     showScreen('portal') // I don't want to "await" here. It's my custom function anyway, not an engine's one.
     
     await Kestrel
-      `The first glyph is Fish.`
-      `The second one is Star.`
-      `And third is...`(500)`[+~] Leaf.`
+      `The first glyph is white::Fish.`
+      `The second one is white::Star.`
+      `And third is...`(500)`[+~] white::Leaf.`
 
     await showScreen('active_portal')
 

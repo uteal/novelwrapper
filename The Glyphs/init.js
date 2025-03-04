@@ -71,7 +71,17 @@ const novel = createNovel(
 
 // I wrapped the callbacks in a function just so I could place them after the createNovel() call.
 function getCallbacks() {
+  const colors = {
+    red: '#e67857',
+    blue: '#6dc1f2',
+    white: '#eeeeee'
+  };
   return {
+    onType(_char, elem, tag) {
+      if (tag !== undefined) {
+        elem.style.color = colors[tag];
+      }
+    },
     onStateChange(prop, _value) {
       switch (prop) {
         case 'FISH': novel.log('🐠', 'First clue found!'); break;
