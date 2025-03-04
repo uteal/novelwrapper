@@ -132,8 +132,6 @@
 
 .novel-message-placeholder {
   opacity: 0;
-  /* color: transparent; */
-  background-color: red;
 }
 
 .novel-message-rendered {
