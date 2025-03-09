@@ -57,7 +57,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     // There is a built-in way to mark some parts of the text with a custom tag. Here I mark the word
     // "true" with the tag "white". Tags are just strings, you can add and use them as you wish.
-    // For an example, see the "onType" callback in the init.js file. Allowed syntax:
+    // For an example, see the "onBeforeType" callback in the init.js file. Allowed syntax:
     // tag::word
     // [tag::several words]
 
@@ -115,7 +115,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       `Oh, as expected.`
       `Lots of adventurers eager to explore the world beyond the newly awakened portal.`
       `But has anyone been able to broke the guard seal yet?`
-      `Whatever. I need to wet my throat.`
+      `Whatever.[350] I need to wet my throat.` // The number in square brackets indicates the pause in milliseconds.
 
     // The "select" function allows the player to choose one of several options passed to it, and (in its simplest form)
     // returns the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
@@ -161,7 +161,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
         `Normally, we don't serve [white::plain water]. So it's only out of respect for the path you have overcome...`
         `...judging by the rags you have instead of clothes.`
       await Raven
-        `That's... kind of you.`
+        `That's...[500] kind of you.`
       
     }
 
@@ -177,18 +177,19 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     // Directive symbols can be placed in square brackets at the beginning of a message.
     // "+" - the text will be added to the previous one, not replace it.
-    // "~" - the text will be printed at lower speed, which will give it emphasis.
+    // "~" - the text will be printed at lower speed.
+    // "!" - the text will be printed instantly.
     await Kestrel
-      `Hey! Wait a minute.`
+      `[~]Hey! [350]Wait a minute.`
       `Am I imagining things, or...`
-      `Is it really you`(500)`[+~], [blue::Black Raven]?`
+      `Is it really you[500], [slow, blue::Black Raven]?`
     
     Raven.$setLabel('Raven')
     
     await Raven
-      `.`(300)`[+].`(300)`[+].`(800)
+      `.[300].[300].`(800)
       `More like Wingless Raven now.`
-      `But you guessed right`(500)`[+~], red::Kestrel.`
+      `But you guessed right[500], [slow, red::Kestrel].`
     
     Kestrel.$setLabel('Kestrel')
 
@@ -246,7 +247,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     if ($.FISH == 0 && $.STAR == 1) {
       await Kestrel
-        `...And is that captain of yours by any chance the gambling half-fox who played poker with us?`
+        `...And is that white::captain of yours by any chance the gambling white::half-fox who played poker with us?`
         `It's just that he's owed me a bottle of whiskey and his tail for ten years now.`
     }
 
@@ -297,7 +298,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
         await Raven
           `There's just one [white::last glyph] left to recall, right? Maybe your memory will give us some clue?`
         await Kestrel
-          `I think... don't laugh... that this is something related to "[white::Birds of Prey]".`
+          `I think... [350]don't laugh... [350]that this is something related to "[slow, white::Birds of Prey]".`
         await Raven
           `...to our former squad? Hmm.`
         
@@ -309,7 +310,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     if ($.LEAF == 1) {
       await Kestrel
-        `So we have all three glyphs.`
+        `So we have all [white::three glyphs].`
         `Ready? Let's go then.`
 
       // The special prefix "~" before the scene id allows you to make a transition without hiding
@@ -332,14 +333,14 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     
     await Kestrel
       `You weren't the only one who confessed to me during those years.`
-      `But you did it in the most awkward way. And most funny. This can't be taken away.`
+      `But you did it in the most awkward way.[500]\nAnd the funniest one.`
     
     await Raven
       `Not sure my feelings have changed much since then. However, you know, I'm too proud to propose twice.`
       `I see you have something to share. Is it related to the new portal?`
     
     await Kestrel
-      `Today I managed to decipher the [white::last three glyphs] of the guard seal.`
+      `Today I managed to decipher the last [white::three glyphs] of the guard seal.`
       `But then... it's like someone cast a spell of oblivion on me. As if they didn't want the portal to open yet.`
     
     await Raven
@@ -358,11 +359,11 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
   fountain: async ({ Raven, Kestrel }) => {
     await showScreen('fountain')
     await Kestrel
-      `I have a feeling that the first glyph I forgot meant... something golden.`
+      `I have a feeling that the first white::glyph I forgot meant something white::golden.`
 
     watch('coins', async () => {
       await Raven
-        `Maybe it's a coin? Like these at the bottom.`
+        `Maybe it's a white::coin? [500]Like these at the bottom.`
       await Kestrel
         `Does anyone really believe that throwing a coin into a fountain will make their wish come true?`
       
@@ -387,7 +388,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       }
       
       await Kestrel
-        `I think I get it. The golden color is from white::fish, like the ones in the water.`
+        `I think I get it. The white::golden color is from white::fish, like the ones in the water.`
         `Well, I actually recalled that. Thanks for the walk, it helps.`
         `Let's go somewhere else?`
       
@@ -410,7 +411,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       watch('star', async () => {
         await Kestrel
           `Stars?.. That's right.`
-          `One of the three glyphs I forgot meant the white::star.`
+          `One of the three white::glyphs I forgot meant the white::star.`
         await Raven
           `Really? Not very original.`
           `Okay then. It's a bit chilly here. I think we should go back.`
@@ -436,7 +437,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     watch('tree_on_the_edge', async () => {
       await Raven
-        `If the last glyph is as simple as the previous ones, I think I know it.`
+        `If the [white::last glyph] is as simple as the previous ones, I think I know it.`
         `Remember what we took for good luck before the flight?`
       
       await print('(Catch as many leaves as you can.)', 500)
@@ -452,7 +453,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       } else if (leaves_caught >= 10) {
         await Kestrel `Wow, I couldn't catch that much.`
       } else if (leaves_caught > 0) {
-        await Kestrel `It's not easy to catch them, huh?`
+        await Kestrel.smiling `It's not easy to catch them, huh?`
       } else {
         await Kestrel `Do you like watching the leaves fall?`
       }
@@ -474,9 +475,9 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     showScreen('portal') // I don't want to "await" here. It's my custom function anyway, not an engine's one.
     
     await Kestrel
-      `The first glyph is white::Fish.`
+      `The first white::glyph is white::Fish.`
       `The second one is white::Star.`
-      `And third is...`(500)`[+~] white::Leaf.`
+      `And third is... [500][white,slow::Leaf].`
 
     await showScreen('active_portal')
 
@@ -490,7 +491,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
 
     clear()
     await sleep(1000)
-    await print('[~]The End.', 500, '[+~] Thanks for playing.')
+    await print('[~]The End.[500] Thanks for playing.')
 
     // If a scene returns anything other than string or undefined, it is considered game over,
     // and the return value is passed to "onGameEnd" callback.

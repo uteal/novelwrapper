@@ -77,9 +77,17 @@ function getCallbacks() {
     white: '#eeeeee'
   };
   return {
-    onType(_char, elem, tag) {
-      if (tag !== undefined) {
-        elem.style.color = colors[tag];
+    onBeforeType(_char, elem, tagStr, stepTime) {
+      if (!tagStr) return;
+      const tags = tagStr.split(/,\s*/);
+      tags.forEach((tag) => {
+        if (Object.hasOwn(colors, tag)) {
+          elem.style.color = colors[tag];
+        }
+      });
+      if (tags.includes('slow')) {
+        // It is possible to return additional "print time" of the current character from here.
+        return stepTime * 3;
       }
     },
     onStateChange(prop, _value) {
