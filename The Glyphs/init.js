@@ -74,7 +74,8 @@ function getCallbacks() {
   const colors = {
     red: '#e67857',
     blue: '#6dc1f2',
-    white: '#eeeeee'
+    white: '#eeeeee',
+    yellow: '#eebb44'
   };
   return {
     onBeforeType(_char, elem, tagStr, stepTime) {

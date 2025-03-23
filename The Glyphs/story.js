@@ -120,9 +120,10 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // The "select" function allows the player to choose one of several options passed to it, and (in its simplest form)
     // returns the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
     // on the player's choice. And don't forget to "await" while the player makes his decision.
+    // By the way, tags work here too (but directives and pauses don't).
     const answer_num = await select(
-      "Bring me a mug of beer!",   // 0
-      "I'd like a glass of water." // 1
+      "Bring me a [yellow::mug of beer]!", // 0
+      "I'd like a [blue::glass of water]." // 1
     )
 
     // Let's say I want to record the player's drink choice for future reference. This is where
