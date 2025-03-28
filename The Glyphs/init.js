@@ -25,7 +25,9 @@ const novel = createNovel(
     firstScene: 'start',           // Entry point of the novel, defaults to "start".
     devMode: true,                 // Allows the engine to output logs. Essential during development.
     stepTime: 1000 / 60,           // The time it takes to print each symbol in milliseconds. Instant if zero.
-    restoreFromSlot: 'autosave',   // The game tries to load from the specified slot, "autosave" by default. Nullify to start over.
+    restoreFromSlot: 'autosave',   // The game tries to load from the specified slot, "autosave" by default.
+    startOver: false,              // Should the game ignore the save data and start over? False by default.
+    noReadWrite: false,            // Do not read or write the game state. Useful when creating very short stories. Defaults to false.
 
     useLocationHash: true,         // If true, the game will store its state as the hash of the window location (URL). This can be a great
                                    // help during development, as it allows you to visually track the state of the game, create bookmarks
@@ -40,7 +42,7 @@ const novel = createNovel(
       showScreen, playMiniGame     // so sometimes you'll need a bunch of your own custom functions.
     },                             // To easily throw them into the scenes, "ext" object can be used.
 
-    cssPrefix: 'novel',            // Engine will use this when searching for CSS styles.
+    cssPrefix: 'novel',            // Engine will use this when searching for CSS styles. Default is "novel".
 
     watchedAttr: 'nw-event',       // If set, the engine will automatically track elements with this attribute,
                                    // and trigger the corresponding event when they are clicked. The engine

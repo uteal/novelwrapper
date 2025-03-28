@@ -308,6 +308,10 @@ for _, group in ipairs(groups) do
       right = right + offset
       top = top - offset
       bottom = bottom + offset
+      for _, sh in ipairs(spec.frames.shift) do
+        sh[1] = sh[1] - offset
+        sh[2] = sh[2] - offset
+      end
     end
 
     local frame_width = right - left
