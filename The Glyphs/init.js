@@ -22,7 +22,7 @@ const novel = createNovel(
       FISH: 0, STAR: 0, LEAF: 0    // must be JSON-serializable to saves to work properly. Empty
     },                             // object by default.
 
-    firstScene: 'start',           // Entry point of the novel, defaults to "start".
+    firstScene: 'start',           // Entry point of the novel, defaults to "start". Set to null to prevent the game from starting automatically.
     devMode: true,                 // Allows the engine to output logs. Essential during development.
     stepTime: 1000 / 60,           // The time it takes to print each symbol in milliseconds. Instant if zero.
     restoreFromSlot: 'autosave',   // The game tries to load from the specified slot, "autosave" by default.
