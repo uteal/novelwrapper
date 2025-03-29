@@ -28,6 +28,7 @@ const novel = createNovel(
     restoreFromSlot: 'autosave',   // The game tries to load from the specified slot, "autosave" by default.
     startOver: false,              // Should the game ignore the save data and start over? False by default.
     noReadWrite: false,            // Do not read or write the game state. Useful when creating very short stories. Defaults to false.
+    noKeyboard: false,             // Ignore keyboard controls. Default is false.
 
     useLocationHash: true,         // If true, the game will store its state as the hash of the window location (URL). This can be a great
                                    // help during development, as it allows you to visually track the state of the game, create bookmarks
