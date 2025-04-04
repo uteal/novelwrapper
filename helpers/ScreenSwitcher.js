@@ -31,13 +31,13 @@ export default class ScreenSwitcher {
    * @returns {ScreenSwitcher}
    * @example
    *    const show = new ScreenSwitcher()
-   *    show("seashore")       // Show screen with background image "./screens/seashore.jpg".
-   *    await show("seashore") // The same, but wait until the screen appears completely.
-   *    await show("mountain") // Switch to screen "./screens/mountain.jpg".
-   *    await show("__prev__") // Switch back to the previous screen (i.e. "seashore").
+   *    show("mountain")       // Show screen with background image "./screens/mountain.jpg".
+   *    await show("mountain") // The same, but wait until the screen appears completely.
+   *    await show("sea", 750) // Switch to screen "./screens/sea.jpg" using custom transition time (in milliseconds).
+   *    await show("__prev__") // Switch back to the previous screen (i.e. "mountain").
    *    await show("__none__") // Switch to no screen.
-   *    await show.prev()      // Shortcut for `await show("__prev__")`.
-   *    await show.none()      // Shortcut for `await show("__none__")`.
+   *    await show.prev()      // Shortcut for `await show("__prev__")`. Can be used with custom transition time parameter.
+   *    await show.none()      // Shortcut for `await show("__none__")`. Can be used with custom transition time parameter.
    *    show.exit()            // Destroy the ScreenSwitcher instance and remove its element.
    */
   constructor({
@@ -81,14 +81,14 @@ export default class ScreenSwitcher {
       this.#element.firstChild,
       this.#element.lastChild
     );
-    const f = (name) => {
+    const f = (name, time = undefined) => {
       if (this.#exited) {
         return;
       }
-      return this.#setScreen(name);
+      return this.#setScreen(name, time);
     };
-    f.none = () => f(this.#none);
-    f.prev = () => f(this.#prev);
+    f.none = (time = undefined) => f(this.#none, time);
+    f.prev = (time = undefined) => f(this.#prev, time);
     f.exit = () => {
       if (this.#exited) {
         return;
@@ -102,7 +102,7 @@ export default class ScreenSwitcher {
     return f;
   }
 
-  async #setScreen(name) {
+  async #setScreen(name, time = this.#transitionTime) {
     if (this.#working) {
       this.#tasks.push(name);
       return;
@@ -126,15 +126,15 @@ export default class ScreenSwitcher {
     this.#working = true;
     const { firstChild, lastChild } = this.#element;
     if (name === this.#none) {
-      await this.#hide(lastChild);
+      await this.#hide(lastChild, time);
       await this.#onAfterScreenHide?.(lastName, lastChild);
       this.#visible = false;
       this.#working = false;
       await this.#nextTask();
     } else if (this.#switchOnly) {
       await this.#onBeforeScreenShow?.(name, firstChild);
-      this.#show(firstChild, !this.#visible);
-      await this.#hide(lastChild);
+      this.#show(firstChild, this.#visible ? 0 : time);
+      await this.#hide(lastChild, time);
       await this.#onAfterScreenHide?.(lastName, lastChild);
       this.#element.prepend(lastChild);
       this.#working = false;
@@ -151,8 +151,8 @@ export default class ScreenSwitcher {
         }
         firstChild.style.backgroundImage = `url('${image.src}')`;
         await this.#onBeforeScreenShow?.(name, firstChild);
-        this.#show(firstChild, !this.#visible);
-        await this.#hide(lastChild);
+        this.#show(firstChild, this.#visible ? 0 : time);
+        await this.#hide(lastChild, time);
         await this.#onAfterScreenHide?.(lastName, lastChild);
         this.#element.prepend(lastChild);
         this.#working = false;
@@ -172,9 +172,9 @@ export default class ScreenSwitcher {
     }
   }
 
-  #show(elem, smooth = false) {
+  #show(elem, time) {
     this.#visible = true;
-    elem.style.transitionDuration = smooth ? this.#transitionTime + 'ms' : '0s';
+    elem.style.transitionDuration = time ? time + 'ms' : '0s';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         elem.style.opacity = '1';
@@ -182,13 +182,13 @@ export default class ScreenSwitcher {
     });
   }
 
-  #hide(elem) {
+  #hide(elem, time) {
     return new Promise((resolve) => {
-      elem.style.transitionDuration = this.#transitionTime + 'ms';
+      elem.style.transitionDuration = time ? time + 'ms' : '0s';
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           elem.style.opacity = '0';
-          setTimeout(resolve, this.#transitionTime);
+          setTimeout(resolve, time);
         });
       });
     });
