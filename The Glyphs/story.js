@@ -214,7 +214,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
   // What's interesting about the scene below is that our heroes return there several times, and depending
   // on their progress, the scene behaves differently. There is nothing stopping you from creating several
   // much simpler scenes that will seem the same scene to the player. But the approach below works just as well.
-  square: async ({ Raven, Kestrel }) => {
+  square: async ({ Raven, Kestrel }, ALL_FOUND = false) => {
 
     // This code will be re-run every time the scene is entered, so we only need to rely on differences in the state
     // of our data storage. As I said, don't use other variables to store data that needs to persist between scenes.
@@ -309,7 +309,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     // If you're curious about how active element highlighting is implemented,
     // take a look at the callback functions inside the "init.js" file.
 
-    if ($.LEAF == 1) {
+    if (ALL_FOUND) {
       await Kestrel
         `So we have all [white::three glyphs].`
         `Ready? Let's go then.`
@@ -468,7 +468,7 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       await Kestrel
         `...I don't mind indulging in nostalgia, but we have business now, don't we?`
       $.LEAF = 1
-      return 'square'
+      return ['square', true] // We can use this method to pass arguments to the scene (ALL_FOUND will be true now).
     })
   },
 
@@ -494,8 +494,8 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
     await sleep(1000)
     await print('[~]The End.[500] Thanks for playing.')
 
-    // If a scene returns anything other than string or undefined, it is considered game over,
-    // and the return value is passed to "onGameEnd" callback.
+    // If a scene returns anything other than string, undefined or array starting with a string,
+    // it is considered game over, and the return value is passed to "onGameEnd" callback.
     return await select("Replay the game", "Go to project's GitHub") // returns 0 or 1
   }
 
