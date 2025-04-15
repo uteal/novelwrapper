@@ -35,7 +35,7 @@ export default async function cacheResources({
     fromList = [
       ...fromList,
       ...(await response.json())
-        .map(str => pathToFile ? pathToFile + '/' + str : str)
+        .map(str => (pathToFile ? pathToFile + '/' + str : str).replaceAll('//', '/'))
     ];
   }
   for (const path of fromList) {
