@@ -2,7 +2,6 @@
  * A function for preloading graphic assets, all parameters are optional. For it to work, provide
  * either a path to a JSON file with a list of resource paths, or a list of resource paths directly.
  * @param {object} params
- * @param {string} params.basePath Will be a prefix to all resource paths.
  * @param {string} params.fromFile A path to a JSON file with a list of resource paths.
  * @param {string[]} params.fromList An array with resource paths.
  * @param {function} params.onProgress A callback that gets the number of currently loaded and total resources.
@@ -10,12 +9,11 @@
  * @returns {Promise<boolean>} A promise that resolves to the same value that is passed to the onComplete callback.
  * @example
  *    cacheResources({
- *      basePath: './assets/',
  *      fromList: [
- *        'characters/Raven/normal.png',
- *        'characters/Raven/gloomy.png'
+ *        './assets/characters/Raven/normal.png',
+ *        './assets/characters/Raven/gloomy.png'
  *      ],
- *      fromFile: './assets/resources.json',
+ *      fromFile: './assets/screens/resources.json',
  *      onProgress: (cur, max) => {
  *        console.log(`Loaded: ${cur} of ${max}`)
  *      },
@@ -23,22 +21,26 @@
  *    });
  */
 export default async function cacheResources({
-  basePath = '',
   fromFile = '',
   fromList = [],
-  onProgress = (_current, _total) => {},
-  onComplete = (_success) => {}
+  onProgress = (_current, _total) => { },
+  onComplete = (_success) => { }
 } = {}) {
   const tasks = [];
   let loaded = 0;
   let errors = 0;
   if (fromFile) {
     const response = await fetch(fromFile);
-    fromList = [...fromList, ...await response.json()];
+    const pathToFile = fromFile.split('/').slice(0, -1).join('/');
+    fromList = [
+      ...fromList,
+      ...(await response.json())
+        .map(str => pathToFile ? pathToFile + '/' + str : str)
+    ];
   }
   for (const path of fromList) {
     const image = new Image();
-    image.src = basePath + path;
+    image.src = path;
     tasks.push(new Promise((resolve) => {
       image.onload = () => {
         loaded += 1;
