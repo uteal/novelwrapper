@@ -20,5 +20,5 @@ def list_resources(start_from, output_file, allowed_ext):
 list_resources(
   start_from = '.',
   output_file = 'resources.json',
-  allowed_ext = ['jpg', 'png', 'gif']
+  allowed_ext = ['jpg', 'png', 'gif', 'svg']
 )
