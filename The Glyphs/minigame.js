@@ -59,7 +59,7 @@ export default () => {
       };
 
       el.addEventListener('mousedown', onCatch);
-      el.addEventListener('ontouchstart', onCatch);
+      el.addEventListener('touchstart', onCatch);
 
       container.append(el);
 
