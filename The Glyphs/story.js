@@ -5,6 +5,7 @@
 // For demonstration purposes I have listed them all, but you can specify only those that you need.
 
 // $      - Persistent data object, its initial fields can be set via initial parameters.
+// _      - A special read-only object that stores the result of the last choice in the current scene.
 // watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
 // select - Lets the player choose an answer from the options given. To be used with "await".
 // call   - Calls a scene as a subscene. An example will be given below. To be used with "await".
@@ -14,7 +15,7 @@
 // save   - Saves the current game state immediately. Only use if you know what you're doing.
 // log    - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
 // ext    - An object with your custom data, as given at the initialization step.
-export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
+export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
 
   // An example of the most basic scene, completely invisible for a player.
   // It does nothing except redirecting the player to another scene named 'road'.
@@ -136,6 +137,23 @@ export default ({ $, watch, select, call, print, clear, sleep, save, log, ext: {
       { BEER : "Bring me a mug of beer!"    }, // "BEER"
       { WATER: "I'd like a glass of water." }  // "WATER"
     )
+    */
+
+    // Another bit of syntactic sugar: you can use a special variable _ that
+    // stores the result of the player's last choice until leaving the scene.
+    /*
+    await select("foo", "bar")
+    _[0] && log("player chose foo")
+    _[1] && log("player chose bar")
+    log(_.__VALUE__) // 0 or 1
+
+    await select(
+      { BEER : "Bring me a mug of beer!"    },
+      { WATER: "I'd like a glass of water." }
+    )
+    _.BEER && log("player chose beer")
+    _.WATER && log("player chose water")
+    log(_.__VALUE__) // "BEER" or "WATER"
     */
 
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.
