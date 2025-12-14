@@ -26,18 +26,16 @@ async ({ Raven, Kestrel }) => {
     `Not the best way to start a conversation, huh?`
     `What are you planning to do next anyway?`
 
-  let choice = await select(
+  await _(
     "Think I should go.",     // 0
     "I'll stay here for now." // 1
   )
 
-  if (choice == 0) {
-    await Kestrel.angry `So begone.`
-  } else {
-    await Kestrel.smile `Do you want me to stay too?`
-  }
+  _[0]
+    ? await Kestrel.angry `So begone.`
+    : await Kestrel.smile `Do you want me to stay too?`
 
-  return choice ? 'good_ending' : 'bad_ending'
+  return _[1] ? 'good_ending' : 'bad_ending'
 
 }
 ```

@@ -6,8 +6,8 @@
 
 // $      - Persistent data object, its initial fields can be set via initial parameters.
 // _      - A special read-only object that stores the result of the last choice in the current scene.
-// watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
 // select - Lets the player choose an answer from the options given. To be used with "await".
+// watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
 // call   - Calls a scene as a subscene. An example will be given below. To be used with "await".
 // note   - Allows you to type text without specifying the speaker. To be used with "await".
 // clear  - Force hide currently visible character and text. For a short pause can be used with "await".
@@ -130,30 +130,35 @@ export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext:
     // Let's say I want to record the player's drink choice for future reference. This is where
     // the game data object comes in handy. It's persistent between game sessions, and that's the whole point.
     $.chosen_drink = ['BEER', 'WATER'][answer_num] // Well, really, why not save it in a more readable form?
-
-    // Alternative notation. You can pass objects as options to get string keys instead of numbers.
+    
     /*
+    // Alternative notation. You can pass objects as options to get string keys instead of numbers.
     $.chosen_drink = await select(
       { BEER : "Bring me a mug of beer!"    }, // "BEER"
       { WATER: "I'd like a glass of water." }  // "WATER"
     )
-    */
 
     // Another bit of syntactic sugar: you can use a special variable _ that
     // stores the result of the player's last choice until leaving the scene.
-    /*
     await select("foo", "bar")
     _[0] && log("player chose foo")
     _[1] && log("player chose bar")
-    log(_.__VALUE__) // 0 or 1
+    log(_.__value__) // 0 or 1
 
+    // String keys can be retrieved in the same way.
     await select(
       { BEER : "Bring me a mug of beer!"    },
       { WATER: "I'd like a glass of water." }
     )
     _.BEER && log("player chose beer")
     _.WATER && log("player chose water")
-    log(_.__VALUE__) // "BEER" or "WATER"
+    log(_.__value__) // "BEER" or "WATER"
+
+    // Under the hood, "_" is a proxy wrapper over the "select" function, and can be called just like it.
+    // Actually, you don't even need "select" at all:
+    await _("foo", "bar")
+    _[0] && log("player chose foo")
+    _[1] && log("player chose bar")
     */
 
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.
