@@ -9,13 +9,13 @@
 // watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
 // select - Lets the player choose an answer from the options given. To be used with "await".
 // call   - Calls a scene as a subscene. An example will be given below. To be used with "await".
-// print  - Allows you to type text without specifying the speaker. To be used with "await".
+// note   - Allows you to type text without specifying the speaker. To be used with "await".
 // clear  - Force hide currently visible character and text. For a short pause can be used with "await".
 // sleep  - Explicitly pauses the execution flow, gets time in milliseconds. To be used with "await".
 // save   - Saves the current game state immediately. Only use if you know what you're doing.
 // log    - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
 // ext    - An object with your custom data, as given at the initialization step.
-export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
+export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
 
   // An example of the most basic scene, completely invisible for a player.
   // It does nothing except redirecting the player to another scene named 'road'.
@@ -48,7 +48,7 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
     // or the emerging landscape for a while. Furthermore, the engine won't start its next built-in action
     // (like a character's speech) until the previous one is finished, and will (hopefully) log an error.
 
-    // [NOTE] It is required to put "await" before each speaking character, select(), call(), print() or sleep().
+    // [NOTE] It is required to put "await" before each speaking character, select(), call(), note() or sleep().
 
     // The character object can be called like a function.
     await Raven('So the rumors were white::true.')
@@ -81,10 +81,10 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
     // Actually, it may be safer not to use semicolons at the end of lines unless necessary, to avoid accidentally
     // splitting parentheses-less calls. Again: if you feel unsure, the second notation is perfectly fine.
 
-    // An example of using the "print" function. Its syntax is less free: only the second notation is supported.
-    await print("Click on the [white::tavern's door].", 0) // The second argument is for auto-proceeding, this will be explained later.
+    // An example of using the "note" function. Its syntax is less free: only the second notation is supported.
+    await note("Click on the [white::tavern's door].", 0) // The second argument is for auto-proceeding, this will be explained later.
 
-    // [NOTE] Text printed by the "print" function is "sticky": it can only be removed
+    // [NOTE] Text displayed by the "note" function is "sticky": it can only be removed
     // by calling the "clear" function or by overwriting it with the character's speech.
 
     // Before the current scene comes to an end and Raven is removed from the screen, let's do one more thing.
@@ -195,8 +195,8 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
       `So I'd better look for a free bench outside...`
 
     // Directive symbols can be placed in square brackets at the beginning of a message.
-    // "~" - the text will be printed at lower speed.
-    // "!" - the text will be printed instantly.
+    // "~" - the text will be typed at lower speed.
+    // "!" - the text will be typed instantly.
     await Kestrel
       `[~]Hey! [350]Wait a minute.`
       `Am I imagining things, or...`
@@ -318,7 +318,7 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
         await Kestrel
           `I think... [350]don't laugh... [350]that this is something related to "[slow, white::Birds of Prey]".`
         await Raven
-          `...to our former squad? Hmm.`
+          `...to our former squad? [350]Hmm.`
         
       }
     }
@@ -458,7 +458,7 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
         `If the [white::last glyph] is as simple as the previous ones, I think I know it.`
         `Remember what we took for good luck before the flight?`
       
-      await print('(Catch as many leaves as you can.)', 500)
+      await note('(Catch as many leaves as you can.)', 500)
 
       // Embedding a minigame. Yes, it's that simple.
       // You can give control to any other function and continue with the result.
@@ -509,7 +509,7 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
 
     clear()
     await sleep(1000)
-    await print('[~]The End.[500] Thanks for playing.')
+    await note('[~]The End.[500] Thanks for playing.')
 
     // If a scene returns anything other than string, undefined or array starting with a string,
     // it is considered game over, and the return value is passed to "onGameEnd" callback.
