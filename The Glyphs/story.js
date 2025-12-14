@@ -195,7 +195,6 @@ export default ({ $, _, watch, select, call, print, clear, sleep, save, log, ext
       `So I'd better look for a free bench outside...`
 
     // Directive symbols can be placed in square brackets at the beginning of a message.
-    // "+" - the text will be added to the previous one, not replace it.
     // "~" - the text will be printed at lower speed.
     // "!" - the text will be printed instantly.
     await Kestrel
