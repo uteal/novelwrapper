@@ -5,8 +5,7 @@
 // For demonstration purposes I have listed them all, but you can specify only those that you need.
 
 // $      - Persistent data object, its initial fields can be set via initial parameters.
-// _      - A special read-only object that stores the result of the last choice in the current scene.
-// select - Lets the player choose an answer from the options given. To be used with "await".
+// _      - Lets the player choose an answer from the options given. To be used with "await".
 // watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
 // call   - Calls a scene as a subscene. An example will be given below. To be used with "await".
 // note   - Allows you to type text without specifying the speaker. To be used with "await".
@@ -15,7 +14,7 @@
 // save   - Saves the current game state immediately. Only use if you know what you're doing.
 // log    - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
 // ext    - An object with your custom data, as given at the initialization step.
-export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
+export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
 
   // An example of the most basic scene, completely invisible for a player.
   // It does nothing except redirecting the player to another scene named 'road'.
@@ -48,7 +47,7 @@ export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext:
     // or the emerging landscape for a while. Furthermore, the engine won't start its next built-in action
     // (like a character's speech) until the previous one is finished, and will (hopefully) log an error.
 
-    // [NOTE] It is required to put "await" before each speaking character, select(), call(), note() or sleep().
+    // [NOTE] It is required to put "await" before each speaking character, _(), call(), note() or sleep().
 
     // The character object can be called like a function.
     await Raven('So the rumors were white::true.')
@@ -118,11 +117,11 @@ export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext:
       `But has anyone been able to broke the guard seal yet?`
       `Whatever.[350] I need to wet my throat.` // The number in square brackets indicates the pause in milliseconds.
 
-    // The "select" function allows the player to choose one of several options passed to it, and (in its simplest form)
-    // returns the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
+    // The "_" callable object allows the player to choose one of several options, and (in its simplest form) returns
+    // the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
     // on the player's choice. And don't forget to "await" while the player makes his decision.
     // By the way, tags work here too (but directives and pauses don't).
-    const answer_num = await select(
+    const answer_num = await _(
       "Bring me a [yellow::mug of beer]!", // 0
       "I'd like a [blue::glass of water]." // 1
     )
@@ -132,33 +131,30 @@ export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext:
     $.chosen_drink = ['BEER', 'WATER'][answer_num] // Well, really, why not save it in a more readable form?
     
     /*
-    // Alternative notation. You can pass objects as options to get string keys instead of numbers.
-    $.chosen_drink = await select(
-      { BEER : "Bring me a mug of beer!"    }, // "BEER"
-      { WATER: "I'd like a glass of water." }  // "WATER"
-    )
+        // Alternative notation. You can pass objects as options to get string keys instead of numbers.
 
-    // Another bit of syntactic sugar: you can use a special variable _ that
-    // stores the result of the player's last choice until leaving the scene.
-    await select("foo", "bar")
-    _[0] && log("player chose foo")
-    _[1] && log("player chose bar")
-    log(_.__value__) // 0 or 1
+        $.chosen_drink = await _(
+          { BEER : "Bring me a mug of beer!"    }, // "BEER"
+          { WATER: "I'd like a glass of water." }  // "WATER"
+        )
 
-    // String keys can be retrieved in the same way.
-    await select(
-      { BEER : "Bring me a mug of beer!"    },
-      { WATER: "I'd like a glass of water." }
-    )
-    _.BEER && log("player chose beer")
-    _.WATER && log("player chose water")
-    log(_.__value__) // "BEER" or "WATER"
+        // Another bit of syntactic sugar. In fact, "_" object stores
+        // the result of the player's last choice in the current scene.
 
-    // Under the hood, "_" is a proxy wrapper over the "select" function, and can be called just like it.
-    // Actually, you don't even need "select" at all:
-    await _("foo", "bar")
-    _[0] && log("player chose foo")
-    _[1] && log("player chose bar")
+        await _("foo", "bar")
+        _[0] && log("player chose foo")
+        _[1] && log("player chose bar")
+        log(_.__value__) // 0 or 1
+
+        // String keys can be retrieved in the same way.
+        
+        await _(
+          { BEER : "Bring me a mug of beer!"    },
+          { WATER: "I'd like a glass of water." }
+        )
+        _.BEER && log("player chose beer")
+        _.WATER && log("player chose water")
+        log(_.__value__) // "BEER" or "WATER"
     */
 
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.
@@ -518,7 +514,7 @@ export default ({ $, _, watch, select, call, note, clear, sleep, save, log, ext:
 
     // If a scene returns anything other than string, undefined or array starting with a string,
     // it is considered game over, and the return value is passed to "onGameEnd" callback.
-    return await select("Replay the game", "Go to project's GitHub") // returns 0 or 1
+    return await _("Replay the game", "Go to project's GitHub") // returns 0 or 1
   }
 
 })
