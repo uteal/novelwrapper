@@ -2,6 +2,15 @@
   Overriding or expanding novel's default styles
 */
 
+.novel-page {
+  font: 20px Courier;
+  font-weight: 700;
+}
+
+.novel-passage-cursive {
+  font-style: italic;
+}
+
 .novel-character {
   width: 384px;
   height: 384px;
@@ -34,18 +43,18 @@
 }
 
 .novel-textbox-of-Raven {
-  color: rgb(175, 217, 233);
+  color: rgb(196, 227, 239);
 }
 
 .novel-textbox-of-Kestrel {
-  color: rgb(240, 188, 165);
+  color: rgb(243, 202, 184);
 }
 
 .novel-textbox-of-Innkeeper {
   color: rgb(200, 200, 200);
 }
 
-.novel-textbox-printed {
+.novel-textbox-note {
   color: rgb(200, 200, 200);
 }
 

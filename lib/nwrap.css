@@ -13,6 +13,94 @@
 }
 
 /*
+  Text-General
+*/
+
+.novel-paragraph {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 8px;
+  row-gap: 1px;
+}
+
+.novel-word {
+  display: flex;
+}
+
+/*
+  Page
+*/
+
+.novel-page {
+  position: absolute;
+  inset: 25%;
+  bottom: 40%;
+  padding: 40px;
+  border-radius: 16px;
+  color: #ddd;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: all 0.5s;
+  transition-property: opacity, background-color;
+}
+
+.novel-page-hidden {
+  opacity: 0;
+}
+
+.novel-page-waiting::after {
+  translate: 0 10px;
+  content: '■';
+  position: absolute;
+  animation-name: novelCursorFlicker;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+
+.novel-passage {
+  font: 20px Courier;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.novel-passage + .novel-passage {
+  margin-top: 10px;
+}
+
+.novel-page-written {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.novel-page-written .novel-link-event,
+.novel-page-written .novel-link-scene {
+  cursor: pointer;
+  transition: color 1s;
+}
+
+.novel-passageFragment {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.novel-passageFragment-rendered {
+  opacity: 1;
+}
+
+.novel-page-written .novel-link-event {
+  color: chartreuse;
+}
+
+.novel-page-written .novel-link-scene {
+  color: violet;
+}
+
+@keyframes novelCursorFlicker {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/*
   Characters
 */
 
@@ -38,10 +126,6 @@
 
 .novel-character-align-right.novel-character-inactive {
   right: 0;
-}
-
-.novel-character-flipped .novel-portrait {
-  transform: scaleX(-1);
 }
 
 .novel-portrait {
@@ -94,7 +178,7 @@
 }
 
 /*
-  Textbox
+  TextBox
 */
 
 .novel-textbox {
@@ -122,37 +206,26 @@
   transition: all 0.5s ease;
 }
 
+/* .novel-textbox-note {} */
+
 .novel-message {
   max-width: 1000px;
-}
-
-.novel-thought {
-  color: rgb(164, 164, 164);
-}
-
-.novel-message-placeholder {
-  opacity: 0;
-}
-
-.novel-message-rendered {
   text-shadow: 0 1px 2px #000;
 }
 
-@keyframes novelCursorFlicker {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
+.novel-messageFragment {
+  display: inline-block;
+  translate: 0 10px;
+  opacity: 0;
+  transition: all 0.2s;
 }
 
-.novel-message-rendered-stopped::after {
-  translate: 4px 0;
-  content: '_';
-  position: absolute;
-  animation-name: novelCursorFlicker;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
-  opacity: 0;
+.novel-messageFragment-rendered {
+  opacity: 1;
+  translate: none;
 }
+
+/* .novel-message-waiting {} */
 
 .novel-textbox-left {
   padding-left: 200px;

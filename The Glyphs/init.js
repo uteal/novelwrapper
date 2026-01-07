@@ -24,10 +24,9 @@ const novel = createNovel(
 
     firstScene: 'start',           // Entry point of the novel, defaults to "start". Set to null to prevent the game from starting automatically.
     devMode: true,                 // Allows the engine to output logs. Essential during development.
-    stepTime: 1000 / 60,           // The time it takes to print each symbol in milliseconds. Instant if zero.
     restoreFromSlot: 'autosave',   // The game tries to load from the specified slot, "autosave" by default.
     startOver: false,              // Should the game ignore the save data and start over? False by default.
-    noReadWrite: false,            // Do not read or write the game state. Useful when creating very short stories. Defaults to false.
+    noSaveLoad: false,             // Do not save or load the game state. Useful when creating very short stories. Defaults to false.
     noKeyboard: false,             // Ignore keyboard controls. Default is false.
 
     useLocationHash: true,         // If true, the game will store its state as the hash of the window location (URL). This can be a great
@@ -81,19 +80,14 @@ function getCallbacks() {
     yellow: '#eebb44'
   };
   return {
-    onBeforeType(_char, elem, tagStr, stepTime) {
-      if (!tagStr) return;
-      const tags = tagStr.split(/,\s*/);
-      tags.forEach((tag) => {
-        if (Object.hasOwn(colors, tag)) {
-          elem.style.color = colors[tag];
-        }
-      });
-      if (tags.includes('slow')) {
-        // It is possible to return additional "print time" of the current character from here.
-        return stepTime * 3;
+    onTaggedPart(elem, tags) {
+      elem.style.color = colors[tags[0]] || tags[0];
+      if (tags.includes('italic')) {
+        elem.style.fontStyle = 'italic';
       }
     },
+    // Fires when a field is set in the game data object ($).
+    // [Note] Changes to nested structures are not tracked.
     onStateChange(prop, _value) {
       switch (prop) {
         case 'FISH': novel.log('🐠', 'First clue found!'); break;

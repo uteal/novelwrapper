@@ -4,17 +4,19 @@
 // The wrapping function provides a couple of data objects and a set of utility functions.
 // For demonstration purposes I have listed them all, but you can specify only those that you need.
 
-// $      - Persistent data object, its initial fields can be set via initial parameters.
-// _      - Lets the player choose an answer from the options given. To be used with "await".
-// watch  - Creates a watcher attached to the current scene. That is how outer events are processed.
-// call   - Calls a scene as a subscene. An example will be given below. To be used with "await".
-// note   - Allows you to type text without specifying the speaker. To be used with "await".
-// clear  - Force hide currently visible character and text. For a short pause can be used with "await".
-// sleep  - Explicitly pauses the execution flow, gets time in milliseconds. To be used with "await".
-// save   - Saves the current game state immediately. Only use if you know what you're doing.
-// log    - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
-// ext    - An object with your custom data, as given at the initialization step.
-export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
+// $     - Persistent data object, its initial fields can be set via initial parameters.
+// _     - Lets the player choose an answer from the options given. To be used with "await".
+// write -
+// erase -
+// when  - Creates an event watcher attached to the current scene. That is how outer events are processed.
+// call  - Calls a scene as a subscene. An example will be given below. To be used with "await".
+// note  - Allows you to type text without specifying the speaker. To be used with "await".
+// mute  - Force hide currently visible character and message. For a short pause can be used with "await".
+// sleep - Explicitly pauses the execution flow, gets time in milliseconds. To be used with "await".
+// save  - Saves the current game state immediately. Only use if you know what you're doing.
+// log   - Alias for console.log that will be silent when not in development mode, and also unwraps $ for cleaner view.
+// ext   - An object with your custom data, as given at the initialization step.
+export default ({ $, _, write, erase, when, call, note, mute, sleep, save, log, ext: { showScreen, playMiniGame } }) => ({
 
   // An example of the most basic scene, completely invisible for a player.
   // It does nothing except redirecting the player to another scene named 'road'.
@@ -31,7 +33,6 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     // The "$" prefix signals that the method modifies the character's persistent data.
     // For example, a character's name set in one scene will be the same in another.
     Raven
-    //.$flipImage()          // Flip character's portraits horizontally. Not needed here.
     //.$toRight()            // The default position for a newly created character is right, so this method is not needed here.
       .$toLeft()             // I'll move Raven to the left side of the screen since he is the main character.
       .$setLabel('Wanderer') // A label that will be shown near the character. It can be changed at any time.
@@ -40,6 +41,18 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     // Let's show the landscape of the current scene. This is what our custom function is for.
     await showScreen('road')
 
+    // But first, let's write a short introduction.
+    // Each paragraph will be displayed after user's action (mouse click, for example).
+    await write(
+      'A tired traveler walked along the road. His gaze searched for something in the distance. It was getting dark.',
+      'Finally, he saw something that he seemed to have been looking for for more than a week.',
+      'And then he said...'
+    )
+    
+    // Okay, let's remove the introductory text.
+    // (I will give a more complete description of the "write" and "erase" functions later.)
+    await erase()
+
     // Now we'll talk about why the "async" keyword appears before the declaration of this scene.
     // It allows us to stop the JavaScript execution flow inside this function using the "await" keyword.
     // We do it because we DON'T want the execution flow to run further, at least for now.
@@ -47,7 +60,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     // or the emerging landscape for a while. Furthermore, the engine won't start its next built-in action
     // (like a character's speech) until the previous one is finished, and will (hopefully) log an error.
 
-    // [NOTE] It is required to put "await" before each speaking character, _(), call(), note() or sleep().
+    // [NOTE] It is required to put "await" before each speaking character, _(), call(), write(), note() or sleep().
 
     // The character object can be called like a function.
     await Raven('So the rumors were white::true.')
@@ -83,13 +96,13 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     // An example of using the "note" function. Its syntax is less free: only the second notation is supported.
     await note("Click on the [white::tavern's door].", 0) // The second argument is for auto-proceeding, this will be explained later.
 
-    // [NOTE] Text displayed by the "note" function is "sticky": it can only be removed
-    // by calling the "clear" function or by overwriting it with the character's speech.
+    // [NOTE] Text displayed by the "note" function is "sticky": it won't disappear until it's overwritten
+    // by the character speech or another scene is started. Use the "mute" function to force it to disappear.
 
-    // Before the current scene comes to an end and Raven is removed from the screen, let's do one more thing.
+    // Before the current scene comes to an end and, let's do one more thing.
     // Here is how to add a watcher. Watchers are used to handle events that can be sent into the novel
     // via the .event(str, ...args) method. The watcher below reacts to the player clicking on the tavern picture.
-    watch('to_tavern', async (/* ...args */) => {
+    when('to_tavern', async (/* ...args */) => {
       await Raven
         `The noise from the tavern makes me think that I was far from the first of the new arrivals.`
         `I guess I should drop in for a drink too.`
@@ -109,18 +122,20 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     // By the way, the game progress is saved every time the player switches between scenes (and only then),
     // so you shouldn't create scenes that are too long to play through.
 
+    // By default, at the start of every scene, erase() and mute() functions are invoked, so you don't need
+    // to manually hide Raven from the screen.
+
     await showScreen('tavern')
 
     await Raven
       `Oh, as expected.`
       `Lots of adventurers eager to explore the world beyond the newly awakened portal.`
-      `But has anyone been able to broke the guard seal yet?`
-      `Whatever.[350] I need to wet my throat.` // The number in square brackets indicates the pause in milliseconds.
+      `But has anyone been able to break the guard seal yet?`
+      `Whatever. [500]I need to wet my throat.` // The number in square brackets indicates the pause in milliseconds.
 
     // The "_" callable object allows the player to choose one of several options, and (in its simplest form) returns
     // the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
     // on the player's choice. And don't forget to "await" while the player makes his decision.
-    // By the way, tags work here too (but directives and pauses don't).
     const answer_num = await _(
       "Bring me a [yellow::mug of beer]!", // 0
       "I'd like a [blue::glass of water]." // 1
@@ -158,7 +173,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     */
 
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.
-    clear()
+    mute()
     await sleep(1000)
 
     Innkeeper.$setLabel('Innkeeper')
@@ -181,7 +196,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
         `Normally, we don't serve [white::plain water]. So it's only out of respect for the path you have overcome...`
         `...judging by the rags you have instead of clothes.`
       await Raven
-        `That's...[500] kind of you.`
+        `That's... [500]kind of you.`
       
     }
 
@@ -189,26 +204,23 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     // Numbers are written in parentheses because only the `string inside backticks` can cause a function call
     // without parentheses. This was discussed above.
     await Raven
-      ``(300)`*gulp*`(500)
-      ``(300)`*gulp*`(500)
+      `[#aaa::*gulp*[500], *gulp*]`(700)
       ($.chosen_drink == 'BEER' ? 'Unexpectedly strong!' : 'Nothing beats pure water.')
       `It's getting dark, and I doubt there's any sense in asking about available rooms.`
       `So I'd better look for a free bench outside...`
 
-    // Directive symbols can be placed in square brackets at the beginning of a message.
-    // "~" - the text will be typed at lower speed.
-    // "!" - the text will be typed instantly.
     await Kestrel
-      `[~]Hey! [350]Wait a minute.`
+      `Hey! [350]Wait a minute.`
       `Am I imagining things, or...`
-      `Is it really you[500], [slow, blue::Black Raven]?`
+      // Multiple tags can be separated by a comma.
+      `Is it really you[500], [blue, italic::Black Raven]?`
     
     Raven.$setLabel('Raven')
     
     await Raven
       `.[300].[300].`(800)
       `More like Wingless Raven now.`
-      `But you guessed right[500], [slow, red::Kestrel].`
+      `But you guessed right[500], [red, italic::Kestrel].`
     
     Kestrel.$setLabel('Kestrel')
 
@@ -290,16 +302,16 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     }
 
     if ($.FISH == 0) {
-      watch('to_fountain', () => 'fountain')
+      when('to_fountain', () => 'fountain')
     }
 
     if ($.STAR == 0) {
-      watch('to_beacon', () => 'beacon')
+      when('to_beacon', () => 'beacon')
     }
 
     if ($.LEAF == 0) {
 
-      watch('to_chasm', async () => {
+      when('to_chasm', async () => {
         if ($.FISH == 0) {
           await Kestrel `There must be a great view there. But maybe we should go to the fountain first?`
           // If the watcher does not return a string, the player remains in the current scene.
@@ -316,11 +328,15 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
 
         await Raven
           `There's just one [white::last glyph] left to recall, right? Maybe your memory will give us some clue?`
-        await Kestrel
-          `I think... [350]don't laugh... [350]that this is something related to "[slow, white::Birds of Prey]".`
-        await Raven
-          `...to our former squad? [350]Hmm.`
-        
+
+        // Here and below, I simply replace frequent pauses with the ^ sign to maintain readability.
+        await Kestrel(
+          "I think... [500]don't laugh...\n[500]This is related to ^[white::B^i^r^d^s ^o^f ^P^r^e^y].".replaceAll('^', '[200]')
+        )
+
+        await Raven(
+          "...to our former squad? [500]H^m^m^.^.^.".replaceAll('^', '[150]')
+        )
       }
     }
 
@@ -332,9 +348,9 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
         `So we have all [white::three glyphs].`
         `Ready? Let's go then.`
 
-      // The special prefix "~" before the scene id allows you to make a transition without hiding
-      // the current character. Since Kestrel's line both ends this scene and opens the next one,
-      // I made sure her portrait doesn't jump around unnecessarily. But it's purely optional.
+      // The special prefix "~" before the scene identifier allows you to make a transition without implicit calling mute() and erase().
+      // Since Kestrel's line both ends this scene and opens the next one, I made sure her portrait doesn't jump around unnecessarily.
+      // But it's purely optional.
       return '~portal'
     }
     
@@ -352,7 +368,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     
     await Kestrel
       `You weren't the only one who confessed to me during those years.`
-      `But you did it in the most awkward way.[500]\nAnd the funniest one.`
+      `But you did it in the most awkward way.\n[700]And the funniest one.`
     
     await Raven
       `Not sure my feelings have changed much since then. However, you know, I'm too proud to propose twice.`
@@ -380,7 +396,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     await Kestrel
       `I have a feeling that the first white::glyph I forgot meant something white::golden.`
 
-    watch('coins', async () => {
+    when('coins', async () => {
       await Raven
         `Maybe it's a white::coin? [500]Like these at the bottom.`
       await Kestrel
@@ -390,7 +406,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
 
         await Raven
           `Why not give it a try?`
-          `*splash*`
+          `#aaa::*splash*`
         await Kestrel
           `Are you sure you can afford to throw coins around?`
           `I hope the wish was worth it.`
@@ -422,12 +438,12 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
     await showScreen('beacon')
     await Raven `Haven't felt the salty wind for a long.`
 
-    watch('lighthouse', async () => {
+    when('lighthouse', async () => {
       await Kestrel `They say the lighthouse hasn't worked for years. Ships don't moor here at night.`
       await Raven `When the sky is clear, the stars are bright here. I knew a captain who could navigate by them very well.`
       
       // A watcher can be created inside a watcher. The created watcher will also be attached to the current scene.
-      watch('star', async () => {
+      when('star', async () => {
         await Kestrel
           `Stars?.. That's right.`
           `One of the three white::glyphs I forgot meant the white::star.`
@@ -454,7 +470,7 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
       `There is something mesmerizing about this tree.`
       `It seems as if it is about to fall down. But it still stands, decade after decade.`
 
-    watch('tree_on_the_edge', async () => {
+    when('tree_on_the_edge', async () => {
       await Raven
         `If the [white::last glyph] is as simple as the previous ones, I think I know it.`
         `Remember what we took for good luck before the flight?`
@@ -477,22 +493,36 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
         await Kestrel `Do you like watching the leaves fall?`
       }
 
-      await Kestrel
-        `You mean... I remember. A silly tradition.`
-        `But you're right. This is it.`
-        `A [white::leaf caught in the wind] was the sign of our squad.`
-      await Raven
-        `Just as elusive - and just as short-lived.`
-      await Kestrel
-        `...I don't mind indulging in nostalgia, but we have business now, don't we?`
-      $.LEAF = 1
-      return ['square', true] // We can use this method to pass arguments to the scene (ALL_FOUND will be true now).
+      // Let's take a deeper look at the "write" function.
+      // First, it has the same capabilities as the character object, meaning it can be called without parentheses.
+      // Second, you can set style modifiers, just like with characters. In the example below, a CSS class "novel-passage-cursive" will be applied to sections of text.
+      await write.cursive
+        `Your result is blue::${leaves_caught}.`
+        // Finally, you can make sections of text active using special tag prefixes.
+        // @ - this tag prefix creates a link to a specific scene (@chasm -> go to scene named "chasm")
+        // & - this tag prefix creates a link to emit a specific event (&next -> trigger watcher of "next" event)
+        `You can @chasm::reenter this scene to replay the game (just for fun), or you can [&next::proceed\u00a0the\u00a0story].`
+        `[#aaa::Click on the colored words above.]`(0)
+
+      when('next', async () => {
+        await erase()
+        await Kestrel
+          `You mean... I remember. A silly tradition.`
+          `But you're right. This is it.`
+          `A [white::leaf caught in the wind] was the sign of our squad.`
+        await Raven
+          `Just as elusive - and just as short-lived.`
+        await Kestrel
+          `...I don't mind indulging in nostalgia, but we have business now, don't we?`
+        $.LEAF = 1
+        return ['square', true] // We can use this method to pass arguments to the scene (ALL_FOUND will be true now).
+      })
     })
   },
 
   portal: async ({ Raven, Kestrel }) => {
     showScreen('portal') // I don't want to "await" here. It's my custom function anyway, not an engine's one.
-    
+
     await Kestrel
       `The first white::glyph is white::Fish.`
       `The second one is white::Star.`
@@ -502,15 +532,15 @@ export default ({ $, _, watch, call, note, clear, sleep, save, log, ext: { showS
 
     await Kestrel.smiling
       `It worked! Looks like you and I are still a worthy team, right, Raven?`
-      
+
     await Raven
       `Fascinating.`
       `I don't know what we'll find there.`
       `But the new world awaits.`
 
-    clear()
+    mute()
     await sleep(1000)
-    await note('[~]The End.[500] Thanks for playing.')
+    await note('The End. [500]Thanks for playing.')
 
     // If a scene returns anything other than string, undefined or array starting with a string,
     // it is considered game over, and the return value is passed to "onGameEnd" callback.
