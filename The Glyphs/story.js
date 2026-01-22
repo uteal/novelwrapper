@@ -93,7 +93,7 @@ export default ({ $, _, write, erase, when, call, note, mute, sleep, save, log, 
     // Actually, it may be safer not to use semicolons at the end of lines unless necessary, to avoid accidentally
     // splitting parentheses-less calls. Again: if you feel unsure, the second notation is perfectly fine.
 
-    // An example of using the "note" function. Its syntax is less free: only the second notation is supported.
+    // An example of using the "note" function. Its syntax is identical to the character's speech. Let's use the second notation here.
     await note("Click on the [white::tavern's door].", 0) // The second argument is for auto-proceeding, this will be explained later.
 
     // [NOTE] Text displayed by the "note" function is "sticky": it won't disappear until it's overwritten
@@ -540,7 +540,9 @@ export default ({ $, _, write, erase, when, call, note, mute, sleep, save, log, 
 
     mute()
     await sleep(1000)
-    await note('The End. [500]Thanks for playing.')
+    // The word "victory" is a style modifier, just like character's mood.
+    await note.victory
+      `The End. [500]Thanks for playing.`
 
     // If a scene returns anything other than string, undefined or array starting with a string,
     // it is considered game over, and the return value is passed to "onGameEnd" callback.
