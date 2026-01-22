@@ -26,8 +26,16 @@
   padding: 4px 0 6px;
 }
 
-.novel-message {
+.novel-messages {
   max-width: 620px;
+}
+
+.novel-message-smiling {
+  color: lightgreen;
+}
+
+.novel-message-victory {
+  color: pink;
 }
 
 .novel-select-option {
