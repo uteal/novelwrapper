@@ -7,8 +7,8 @@ import myStory from './story.js';
 // A minigame about catching falling leaves.
 import playMiniGame from './minigame.js';
 
-// Makes a new novel from the scenes given. Returns a handle with a set of useful methods.
-const novel = createNovel(
+// Makes a new novel from the scenes given. Returns a (promised) handle with a set of useful methods.
+const novel = await createNovel(
 
   // Unique name used to differentiate between progress saves.
   'the_glyphs',
@@ -63,7 +63,12 @@ const novel = createNovel(
   }
 
 );
-// The novel is ready.
+
+// The novel is ready. Here we can make some preparations using the novel handle.
+// ...
+
+// But now let's just run it!
+novel.run();
 
 // --------------------------------------------------------------------
 // The code below is for creating interactive elements on game screens.
