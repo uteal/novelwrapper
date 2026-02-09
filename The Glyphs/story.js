@@ -31,11 +31,12 @@ export default ({ $, _, write, erase, when, call, note, mute, sleep, save, log, 
 
     // Character's methods showcase. All are syncronous (no "await" required). Chaining is available.
     // The "$" prefix signals that the method modifies the character's persistent data.
-    // For example, a character's name set in one scene will be the same in another.
+    // For example, a character's name set with $setLabel in one scene will be the same in another.
     Raven
     //.$toRight()            // The default position for a newly created character is right, so this method is not needed here.
       .$toLeft()             // I'll move Raven to the left side of the screen since he is the main character.
       .$setLabel('Wanderer') // A label that will be shown near the character. It can be changed at any time.
+    // There are also methods toRight, toLeft, setLabel (without the $ symbol). Their effect lasts only until the end of the scene.
 
     // The character is still invisible. He will appear when he needs to say something.
     // Let's show the landscape of the current scene. This is what our custom function is for.
