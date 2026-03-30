@@ -134,43 +134,51 @@ export default ({ $, _, write, erase, when, call, note, mute, sleep, save, log, 
       `But has anyone been able to break the guard seal yet?`
       `Whatever. [500]I need to wet my throat.` // The number in square brackets indicates the pause in milliseconds.
 
-    // The "_" callable object allows the player to choose one of several options, and (in its simplest form) returns
-    // the ordinal number of chosen option, starting from zero. Thus, answer_num will be equal to 0 or 1 depending
+    // The _ (underscore) callable object allows the player to choose one of several options, and (in its simplest form) returns
+    // the ordinal number of chosen option, starting from zero. Thus, choice_num will be equal to 0 or 1 depending
     // on the player's choice. And don't forget to "await" while the player makes his decision.
-    const answer_num = await _(
-      "Bring me a [yellow::mug of beer]!", // 0
-      "I'd like a [blue::glass of water]." // 1
+
+    // const choice_num = await _(
+    //   "Bring me a [yellow::mug of beer]!", // 0
+    //   "I'd like a [blue::glass of water]." // 1
+    // )
+
+    // But I will use the expanded notation here, since I want to get as a result not the option number,
+    // but a more convenient string value. The result will be "BEER" or "WATER".
+    const choice = await _(
+      { value: "BEER", label: "Bring me a [yellow::mug of beer]!" },
+      { value: "WATER", label: "I'd like a [blue::glass of water]." }
     )
+
+    // You can pass here both strings and objects, although I don't recommend mixing the two.
+    // In the passed objects, the "label" and "value" fields are required.
+    // Another useful fields are "lock" and "hide" (both falsy by default).
 
     // Let's say I want to record the player's drink choice for future reference. This is where
     // the game data object comes in handy. It's persistent between game sessions, and that's the whole point.
-    $.chosen_drink = ['BEER', 'WATER'][answer_num] // Well, really, why not save it in a more readable form?
-    
+    $.chosen_drink = choice;
+
     /*
-        // Alternative notation. You can pass objects as options to get string keys instead of numbers.
 
-        $.chosen_drink = await _(
-          { BEER : "Bring me a mug of beer!"    }, // "BEER"
-          { WATER: "I'd like a glass of water." }  // "WATER"
-        )
+      // Another bit of syntactic sugar. In fact, "_" object stores
+      // the result of the player's last choice in the current scene.
 
-        // Another bit of syntactic sugar. In fact, "_" object stores
-        // the result of the player's last choice in the current scene.
+      await _("foo", "bar")
+      _[0] && log("player chose foo")
+      _[1] && log("player chose bar")
+      log(_.__value__) // 0 or 1
 
-        await _("foo", "bar")
-        _[0] && log("player chose foo")
-        _[1] && log("player chose bar")
-        log(_.__value__) // 0 or 1
+      
+      // String keys can be retrieved in the same way.
 
-        // String keys can be retrieved in the same way.
-        
-        await _(
-          { BEER : "Bring me a mug of beer!"    },
-          { WATER: "I'd like a glass of water." }
-        )
-        _.BEER && log("player chose beer")
-        _.WATER && log("player chose water")
-        log(_.__value__) // "BEER" or "WATER"
+      await _(
+        { value: "BEER", label: "Bring me a mug of beer!" },
+        { value: "WATER", label: "I'd like a glass of water." }
+      )
+      _.BEER && log("player chose beer")
+      _.WATER && log("player chose water")
+      log(_.__value__) // "BEER" or "WATER"
+
     */
 
     // Let's take Raven off screen and add a dramatic pause while he waits for his order.

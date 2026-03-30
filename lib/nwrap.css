@@ -256,6 +256,8 @@
   translate: 0 -100px;
 }
 
+/* .novel-select[scene="tavern"] {} */
+
 .novel-select-hidden {
   opacity: 0;
   translate: 0 -120px;
@@ -275,8 +277,13 @@
   border-top: 1px solid #666;
 }
 
-.novel-select-option:hover {
+.novel-select-option:not(.novel-select-option-locked):hover {
   background-color: #111;
+}
+
+.novel-select-option-locked {
+  background-color: #666;
+  cursor: default;
 }
 
 /*
