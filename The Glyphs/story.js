@@ -535,7 +535,7 @@ export default ({ $, _, write, erase, when, call, note, mute, sleep, save, log, 
     await Kestrel
       `The first white::glyph is white::Fish.`
       `The second one is white::Star.`
-      `And third is... [500][white,slow::Leaf].`
+      `And third is... [500]white::Leaf.`
 
     await showScreen('active_portal')
 
